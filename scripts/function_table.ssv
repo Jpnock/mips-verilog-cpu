@@ -1,0 +1,8 @@
+SLL * SRL SRA SLLV * SRLV SRAV
+JR JALR * * SYSCALL BREAK * *
+MFHI MTHI MFLO MTLO * * * *
+MULT MULTU DIV DIVU * * * *
+ADD ADDU SUB SUBU AND OR XOR NOR
+* * SLT SLTU * * * *
+* * * * * * * *
+* * * * * * * *

@@ -1,0 +1,8 @@
+SPECIAL REGIMM J JAL BEQ BNE BLEZ BGTZ
+ADDI ADDIU SLTI SLTIU ANDI ORI XORI LUI
+* * * * * * * *
+* * * * * * * *
+LB LH LWL LW LBU LHU LWR *
+SB SH SWL SW * * SWR *
+* * * * * * * *
+* * * * * * * *
