@@ -42,6 +42,14 @@ module alu (
   assign sign_extended_imm = signextend16to32(immediate_i);
   assign zero_extended_imm = zeroextend16to32(immediate_i);
 
+  logic [4:0] static_shift_amount;
+  assign static_shift_amount = immediate_i[10:6];
+
+  // Used for variable length shifts (register specified).
+  // Obtained from the lower 5 bits of rs.
+  logic [4:0] variable_shift_amount;
+  assign variable_shift_amount = rs_i[4:0];
+
   // TODO: Remove this when DIV and DIVU are implemented.
   assign stall_o = 0;
 
@@ -49,7 +57,12 @@ module alu (
     case (opcode_i)
       OP_SPECIAL: begin
         case (funct_i)
-          // ADD
+          FUNC_SLL:  rd_o = rt_i << static_shift_amount;
+          FUNC_SRL:  rd_o = rt_i >> static_shift_amount;
+          FUNC_SRA:  rd_o = rt_i >>> static_shift_amount;
+          FUNC_SLLV: rd_o = rt_i << variable_shift_amount;
+          FUNC_SRLV: rd_o = rt_i >> variable_shift_amount;
+          FUNC_SRAV: rd_o = rt_i >>> variable_shift_amount;
           FUNC_ADD: begin
             // TODO: fire exception on overflow
             rd_o = rs_i + rt_i;
