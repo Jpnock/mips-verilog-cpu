@@ -4,7 +4,7 @@ module fsm (
     input logic clk,
     input logic reset_i,
     input logic stall_i,
-    output logic [1:0] state_o
+    output state_t state_o
 );
 
   // TODO: Check if we need to transition to the next state on the negedge of a stall.
