@@ -11,7 +11,7 @@ module cpu_pc (
     // Set to high when branching. PC output will change accordingly cycle after the next assuming WEN is also high.
     input  logic  b_cond_met,
     // During a branch, set this to the location to branch to.
-    input  size_t pc_in,
+    input  size_t pc_i,
     // PC output
     output size_t pc_o
 );
@@ -72,7 +72,7 @@ module cpu_pc (
     end else begin
 
       if (b_cond_met == 1) begin
-        branch_d = pc_in;
+        branch_d = pc_i;
       end else begin
         branch_d = branch_q;
       end
