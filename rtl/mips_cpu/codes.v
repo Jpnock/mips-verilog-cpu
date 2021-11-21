@@ -1,5 +1,7 @@
 package codes;
 
+  typedef logic [31:0] size_t;
+
   // FSM codes.
   typedef enum logic [1:0] {
     FETCH = 2'b00,
