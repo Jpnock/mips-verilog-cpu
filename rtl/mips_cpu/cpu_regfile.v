@@ -34,6 +34,4 @@ module regfile (
     end
   end
 
-  assign a = regs[addr_3_i];
-
 endmodule
