@@ -29,6 +29,7 @@ module mips_cpu_bus (
   logic pc_wen, ir_wen, reg_wen, src_b_sel, ram_a_sel, reg_wd_sel, reg_a3_sel;
 
   // PC
+  logic b_cond_met;
   logic [31:0] pc_o, pc_i;
 
   // IR
@@ -71,12 +72,14 @@ module mips_cpu_bus (
       .reg_a3_sel_o(reg_a3_sel)
   );
 
-  assign pc_i = read_data_1;  // TODO: For JR only. Change if required.
+  assign pc_in = read_data_1;  // TODO: For JR only. Change if required.
+  assign b_cond_met = 1'b0;     //TODO: Add proper control logic for when branch conditions are met.
   pc pc (
       .clk(clk),
       .reset_i(reset),
       .wen_i(pc_wen),
-      .pc_i(pc_i),
+      .b_cond_met(b_cond_met),
+      .pc_in(pc_in),
       .pc_o(pc_o)
   );
 
