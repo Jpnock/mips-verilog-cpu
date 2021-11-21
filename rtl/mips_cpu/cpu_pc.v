@@ -1,16 +1,19 @@
-module cpu_pc (
-    input logic clk,
-    input logic reset, // resets every register in the PC. Will take one full cycle to complete. Independent of WEN.
+import codes::*;
 
-    /*
-    if low, the state of the PC can not be changed in any meaningful way unless it is reset.
-    if high during a positive clock edge, the PC will "iterate". I.e. update itself based on other inputs.
-    In the usual fetch, E1, E2 cycle this should therefore only be high for only one of these cycles. 
-    */
-    input logic wen,
-    input logic b_cond_met,   // Set to high when branching. PC output will change accordingly cycle after the next assuming WEN is also high.
-    input logic [31:0] pc_in,  // during a branch, set this to the location to branch to.
-    output logic [31:0] pc_o  // pc output
+module cpu_pc (
+    input  logic  clk,
+    // Resets every register in the PC. Will take one full cycle to complete. Independent of WEN.
+    input  logic  reset,
+    // If low, the state of the PC can not be changed in any meaningful way unless it is reset.
+    // If high during a positive clock edge, the PC will "iterate". I.e. update itself based on other inputs.
+    // In the usual fetch, E1, E2 cycle this should therefore only be high for only one of these cycles.
+    input  logic  wen,
+    // Set to high when branching. PC output will change accordingly cycle after the next assuming WEN is also high.
+    input  logic  b_cond_met,
+    // During a branch, set this to the location to branch to.
+    input  size_t pc_in,
+    // PC output
+    output size_t pc_o
 );
 
   /* 
@@ -46,11 +49,11 @@ module cpu_pc (
   (Feel free to delete/remove this giant block of text)
 	*/
 
-  logic [31:0] reset_pos = 32'hBFC00000;
+  size_t reset_pos = 32'hBFC00000;
 
-  logic [31:0] pc_d, pc_q;
+  size_t pc_d, pc_q;
   logic reset_d, reset_q;
-  logic [31:0] branch_d, branch_q;
+  size_t branch_d, branch_q;
   logic sel_branch_d, sel_branch_q;
 
   assign pc_o = pc_q;
@@ -86,7 +89,8 @@ module cpu_pc (
   end
 
   always_ff @(posedge clk) begin
-    if (reset_q == 1 && reset_d == 0) begin  // negedge reset detected
+    // Negedge reset detected
+    if (reset_q == 1 && reset_d == 0) begin
       pc_q <= reset_pos;
     end else begin
       pc_q <= pc_d;
