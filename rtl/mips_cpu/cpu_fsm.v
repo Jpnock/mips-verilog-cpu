@@ -1,9 +1,9 @@
 import codes::*;
 
 module fsm (
-    input logic clk,
-    input logic reset_i,
-    input logic stall_i,
+    input  logic   clk,
+    input  logic   reset_i,
+    input  logic   stall_i,
     output state_t state_o
 );
 
