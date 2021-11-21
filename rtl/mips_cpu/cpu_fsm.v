@@ -9,7 +9,7 @@ module fsm (
 
   // TODO: Check if we need to transition to the next state on the negedge of a stall.
 
-  logic [1:0] state_d, state_q;
+  state_t state_d, state_q;
 
   always_comb begin
     if (reset_i == 1) begin
@@ -21,10 +21,7 @@ module fsm (
         case (state_q)
           FETCH: state_d = EXEC1;
           EXEC1: state_d = EXEC2;
-          EXEC2: state_d = FETCH;
-          default: begin
-            state_d = 0;
-          end
+          default: state_d = FETCH;
         endcase
       end
     end
