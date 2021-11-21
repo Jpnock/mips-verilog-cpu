@@ -21,6 +21,10 @@ module regfile (
       end
     end else if (write_enable_i == 1) begin
       regs[addr_3_i] <= write_data_3_i;
+
+      // Check if regs[0] is being written to with a non-zero value.
+      assert (~((addr_3_i == 0) && (write_data_3_i != 0)))
+      else $fatal(0, "The content of reg[0] is no longer 0.");
     end
   end
 
