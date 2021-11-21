@@ -42,7 +42,7 @@ module mips_cpu_bus (
 
   // ALU
   logic stall_alu;
-  logic [31:0] mfhi, mflo, rd_data, rt_data, alu_out;
+  logic [31:0] mfhi, mflo, rd_data, rt_data, alu_out, effective_address;
 
 
   /* Modules */
@@ -118,6 +118,7 @@ module mips_cpu_bus (
       .immediate_i(immediate),
       .rd_o(rd_data),
       .rt_o(rt_data),
+      .effective_address_o(effective_address),
       .mfhi_o(mfhi),
       .mflo_i(mflo),
       .stall_o(stall_alu)
@@ -129,7 +130,7 @@ module mips_cpu_bus (
   /* Other IO/IN. */
   assign active = 1;  //TODO: Think of implementation.
   assign register_v0 = 0;  //TODO: Fish out signal from Reg File.
-  assign address = (ram_a_sel == 1) ? alu_out : pc_o;
+  assign address = (ram_a_sel == 1) ? effective_address : pc_o;
   assign writedata = read_data_2;
   assign byteenable = 4'b1111;  //TODO: Change when LB instructions are implemented.
 
