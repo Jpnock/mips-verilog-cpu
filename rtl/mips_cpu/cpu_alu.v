@@ -26,7 +26,7 @@ module alu (
 
   function [31:0] signextend16to32(input [15:0] x);
     begin
-      return (x >> 15) == 1 ? {16'b1, x} : {16'b0, x};
+      return x[15] == 1 ? {16'b1, x} : {16'b0, x};
     end
   endfunction
 
