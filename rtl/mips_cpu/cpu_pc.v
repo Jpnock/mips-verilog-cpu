@@ -1,9 +1,15 @@
 module cpu_pc (
     input logic clk,
-    input logic reset,  // resets every register in the PC. Will take one full cycle to complete.
-    input logic wen,          // if low, the state of the PC can not be changed in any meaningful way unless it is reset.
-    input logic b_instr,      // during a branch instruction, set this to high. PC output will change accordingly cycle after the next.
-    input logic [31:0] pc_in, // during a branch instruction, set this to the location to branch to.
+    input logic reset, // resets every register in the PC. Will take one full cycle to complete. Independent of WEN.
+
+    /*
+    if low, the state of the PC can not be changed in any meaningful way unless it is reset.
+    if high during a positive clock edge, the PC will "iterate". I.e. update itself based on other inputs.
+    In the usual fetch, E1, E2 cycle this should therefore only be high for only one of these cycles. 
+    */
+    input logic wen,
+    input logic b_cond_met,   // Set to high when branching. PC output will change accordingly cycle after the next assuming WEN is also high.
+    input logic [31:0] pc_in,  // during a branch, set this to the location to branch to.
     output logic [31:0] pc_o  // pc output
 );
 
@@ -60,7 +66,7 @@ module cpu_pc (
       sel_branch_d = sel_branch_q;
     end else begin
 
-      if (b_instr == 1) begin
+      if (b_cond_met == 1) begin
         branch_d = pc_in;
       end else begin
         branch_d = branch_q;
@@ -72,7 +78,7 @@ module cpu_pc (
         pc_d = pc_q + 4;
       end
 
-      sel_branch_d = b_instr;
+      sel_branch_d = b_cond_met;
 
     end
   end
