@@ -1,4 +1,12 @@
 package codes;
+
+  // FSM codes.
+  typedef enum logic [1:0] {
+    FETCH = 2'b00,
+    EXEC1 = 2'b01,
+    EXEC2 = 2'b10
+  } state_t;
+
   // opcode_t defines the 6-bit opcode mapping.
   // This can be found on page 189, A-177 of
   // https://www.cs.cmu.edu/afs/cs/academic/class/15740-f97/public/doc/mips-isa.pdf
