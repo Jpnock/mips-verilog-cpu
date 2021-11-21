@@ -46,7 +46,7 @@ module cpu_pc (
   (Feel free to delete/remove this giant block of text)
 	*/
 
-  integer reset_pos = 'hBFC00000;
+  logic [31:0] reset_pos = 32'hBFC00000;
 
   logic [31:0] pc_d, pc_q;
   logic [31:0] branch_d, branch_q;
