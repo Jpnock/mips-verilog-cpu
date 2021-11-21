@@ -1,6 +1,6 @@
 import codes::*;
 
-module cpu_pc (
+module pc (
     input  logic  clk,
     // Resets every register in the PC. Will take one full cycle to complete. Independent of WEN.
     input  logic  reset,

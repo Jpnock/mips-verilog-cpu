@@ -74,14 +74,14 @@ module mips_cpu_bus (
   );
 
   // TODO: For JR only. Change if required.
-  assign pc_i = read_data_1;
+  assign pc_i = rs_regfile_data;
   // TODO: Add proper control logic for when branch conditions are met.
   assign b_cond_met = 1'b0;
 
   pc pc (
       .clk(clk),
-      .reset_i(reset),
-      .wen_i(pc_wen),
+      .reset(reset),
+      .wen(pc_wen),
       .b_cond_met(b_cond_met),
       .pc_i(pc_i),
       .pc_o(pc_o)

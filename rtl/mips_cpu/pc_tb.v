@@ -82,12 +82,12 @@ module pc_tb ();
 
   end
 
-  cpu_pc pc (
+  pc pc (
       .clk(clk),
       .reset(reset),
       .wen(wen),
       .b_cond_met(b_cond_met),
-      .pc_in('hAAA00000),
+      .pc_i('hAAA00000),
       .pc_o(pc_o)
   );
 
