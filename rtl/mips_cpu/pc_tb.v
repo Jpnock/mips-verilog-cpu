@@ -2,7 +2,7 @@ module pc_tb ();
   logic clk;
   logic reset;
   logic wen;
-  logic b_instr;
+  logic b_cond_met;
   logic [31:0] pc_o;
 
   initial begin
@@ -23,7 +23,7 @@ module pc_tb ();
   initial begin
     reset = 1;
     wen = 1;
-    b_instr = 0;
+    b_cond_met = 0;
 
     repeat (3) begin
       @(posedge clk);
@@ -38,30 +38,32 @@ module pc_tb ();
       @(posedge clk);
     end
 
-    #1;
     reset = 1;
+    #0;
 
     repeat (3) begin
       @(posedge clk);
     end
 
-    #1;
     reset = 0;
-    assert (pc_o != 'hBFC00000);
+    #0;
 
+    //$display("reset_d: %b", reset);
     @(posedge clk);
     assert (pc_o == 'hBFC00000);
 
+
     repeat (3) begin
       @(posedge clk);
     end
 
-    b_instr = 1;
+    b_cond_met = 1;
     assert (pc_o == 'hBFC0000C);
     @(posedge clk);
 
     // branch instruction at 0xBFC00010
-    b_instr = 0;
+    b_cond_met = 0;
+    #0;
     assert (pc_o == 'hBFC00010);
     @(posedge clk);
 
@@ -84,7 +86,7 @@ module pc_tb ();
       .clk(clk),
       .reset(reset),
       .wen(wen),
-      .b_instr(b_instr),
+      .b_cond_met(b_cond_met),
       .pc_in('hAAA00000),
       .pc_o(pc_o)
   );

@@ -49,10 +49,12 @@ module cpu_pc (
   logic [31:0] reset_pos = 32'hBFC00000;
 
   logic [31:0] pc_d, pc_q;
+  logic reset_d, reset_q;
   logic [31:0] branch_d, branch_q;
   logic sel_branch_d, sel_branch_q;
 
   assign pc_o = pc_q;
+  assign reset_d = reset;
 
   always_comb begin
 
@@ -84,13 +86,16 @@ module cpu_pc (
   end
 
   always_ff @(posedge clk) begin
-    pc_q <= pc_d;
+    if (reset_q == 1 && reset_d == 0) begin  // negedge reset detected
+      pc_q <= reset_pos;
+    end else begin
+      pc_q <= pc_d;
+    end
+
+    reset_q <= reset_d;
     branch_q <= branch_d;
     sel_branch_q <= sel_branch_d;
   end
 
-  always_ff @(negedge reset) begin
-    pc_q <= reset_pos;
-  end
 
 endmodule
