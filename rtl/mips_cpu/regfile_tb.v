@@ -10,7 +10,7 @@ module reg_file_tb ();
   logic write_enable_i;
   size_t read_data_1_o;
   size_t read_data_2_o;
-  size_t a;
+  size_t a; // Note: Add output in cpu_regfile.v when testing.
 
   initial begin
 

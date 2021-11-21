@@ -9,8 +9,7 @@ module regfile (
     input size_t write_data_3_i,
     input logic write_enable_i,
     output size_t read_data_1_o,
-    output size_t read_data_2_o,
-    output size_t a
+    output size_t read_data_2_o
 );
 
   size_t regs[4:0];
