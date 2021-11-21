@@ -117,8 +117,7 @@ module alu (
       OP_XORI: rt_o = rs_i ^ zero_extended_imm;
       // TODO: LUI mentions something about sign extension but that doesn't make sense in this context.
       OP_LUI: rt_o = {immediate_i << 16, 16'b0};
-      OP_LW: effective_address_o = sign_extended_imm + rs_i;
-      OP_SW: effective_address_o = sign_extended_imm + rs_i;
+      OP_LW, OP_SW: effective_address_o = sign_extended_imm + rs_i;
     endcase
   end
 
