@@ -1,5 +1,7 @@
 package codes;
 
+  typedef logic [4:0] regaddr_t;
+
   typedef logic [31:0] size_t;
 
   // FSM codes.
