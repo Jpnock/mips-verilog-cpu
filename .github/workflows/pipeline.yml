@@ -15,7 +15,8 @@ jobs:
         password: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v2
-      - name: Build
-        id: build
+      - name: Build and test
+        id: build_and_test
+        timeout-minutes: 1
         run: |
           make
