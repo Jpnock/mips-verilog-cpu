@@ -16,8 +16,9 @@ module ir (
       output logic[25:0] target_o
 );
 
-    logic [31:0] ihold; //the register that holds the instruction in EXEC2 and the next FETCH
-    logic [31:0] data;
+    // The register that holds the instruction in EXEC2 and the next FETCH
+    size_t ihold;
+    size_t data;
 
     always_ff @(posedge clk) begin
         if (state_o == EXEC1) begin
