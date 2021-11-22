@@ -90,6 +90,7 @@ module mips_cpu_bus (
 
   ir ir (
       .clk(clk),
+      .state_i(state),
       .wen_i(ir_wen),
       .reset_i(reset),
       .instr_i(readdata),
