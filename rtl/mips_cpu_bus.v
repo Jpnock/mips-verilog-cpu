@@ -35,6 +35,7 @@ module mips_cpu_bus (
   // IR
   regaddr_t rs, rt, rd;
   logic [15:0] immediate;
+  logic [4:0] shift;
 
   // RegFile
   regaddr_t addr_3;
@@ -96,6 +97,7 @@ module mips_cpu_bus (
       .instr_i(readdata),
       .opcode_o(opcode),
       .funct_o(funct),
+      .shift_o(shift),  // TODO: Remove if not used.
       .rs_o(rs),
       .rt_o(rt),
       .rd_o(rd),
