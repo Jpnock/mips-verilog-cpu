@@ -1,7 +1,7 @@
 FROM ubuntu:20.04
 
 RUN apt update
-RUN apt install -y gperf autoconf bison gcc make flex build-essential
+RUN apt install -y git gperf autoconf bison gcc make flex build-essential
 
 RUN mkdir -p /tmp/iverilog-build-dir
 
