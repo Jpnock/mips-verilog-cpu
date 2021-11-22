@@ -15,6 +15,8 @@ module control (
     output logic reg_a3_sel_o
 );
 
+  // TODO: Add logic for more instructions.
+
   always_comb begin
     case (opcode_i)
       OP_SW: begin
@@ -77,5 +79,4 @@ module control (
       end
     endcase
   end
-
 endmodule
