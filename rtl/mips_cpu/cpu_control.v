@@ -20,8 +20,6 @@ module control (
   always_comb begin
     case (opcode_i)
       OP_SW: begin
-        pc_wen_o = (state_i == EXEC2) ? 1 : 0;
-        ir_wen_o = (state_i == EXEC1) ? 1 : 0;
         ram_wen_o = (state_i == EXEC2) ? 1 : 0;
         ram_rds_o = (state_i == FETCH) ? 1 : 0;
         reg_wen_o = 0;
