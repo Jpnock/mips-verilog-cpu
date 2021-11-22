@@ -128,6 +128,7 @@ module mips_cpu_bus (
       .immediate_i(immediate),
       .rd_o(rd_data_d),
       .rt_o(rt_data_d),
+      .effective_address_o(effective_address),
       .mfhi_o(mfhi),
       .mflo_o(mflo),
       .stall_o(stall_alu)
