@@ -1,6 +1,6 @@
 import codes::*;
 
-module reg_file_tb ();
+module regfile_tb ();
   logic clk;
   logic reset_i;
   regaddr_t addr_1_i;
@@ -10,12 +10,12 @@ module reg_file_tb ();
   logic write_enable_i;
   size_t read_data_1_o;
   size_t read_data_2_o;
-  size_t a; // Note: Add output in cpu_regfile.v when testing.
 
   initial begin
 
-    $dumpfile("reg_file_tb.vcd");
-    $dumpvars(0, reg_file_tb);
+    $dumpfile("regfile_tb.vcd");
+    $dumpvars(0, regfile_tb);
+
 
     clk = 0;
     #1;
@@ -30,24 +30,25 @@ module reg_file_tb ();
   initial begin
 
     addr_1_i = 0;
-    addr_2_i = 0;
+    addr_2_i = 1;
     addr_3_i = 1;
     write_data_3_i = 1;
     write_enable_i = 1;
 
     #3;
 
-    assert (a == 1);
+    assert (read_data_2_o == 1);
 
     #1;
 
+    addr_1_i = 2;
     addr_3_i = 2;
     write_data_3_i = 2;
     write_enable_i = 1;
 
     #3;
 
-    assert (a == 2);
+    assert (read_data_1_o == 2);
 
     #1;
 
@@ -80,8 +81,7 @@ module reg_file_tb ();
       .write_data_3_i(write_data_3_i),
       .write_enable_i(write_enable_i),
       .read_data_1_o(read_data_1_o),
-      .read_data_2_o(read_data_2_o),
-      .a(a)
+      .read_data_2_o(read_data_2_o)
   );
 
 endmodule
