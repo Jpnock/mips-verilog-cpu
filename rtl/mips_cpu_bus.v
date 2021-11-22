@@ -29,25 +29,27 @@ module mips_cpu_bus (
   logic pc_wen, ir_wen, reg_wen, src_b_sel, ram_a_sel, reg_wd_sel, reg_a3_sel;
 
   // PC
-  logic [31:0] pc_o, pc_i;
+  logic b_cond_met;
+  size_t pc_o, pc_i;
 
   // IR
-  logic [4:0] rs, rt, rd;
+  regaddr_t rs, rt, rd;
   logic [15:0] immediate;
 
   // RegFile
-  logic [ 4:0] addr_3;
-  logic [31:0] read_data_1, read_data_2, write_data_3;
+  regaddr_t addr_3;
+  size_t rs_regfile_data, rs_data_d, rt_regfile_data, rt_data_d, write_data_3, rd_data_d;
 
 
   // ALU
   logic stall_alu;
-  logic [31:0] mfhi, mflo, rd_data, rt_data, alu_out, effective_address;
+  size_t mfhi, mflo, alu_out, effective_address;
 
 
   /* Modules */
 
-  assign stall = stall_alu;  //TODO: Add wait request stalls later.
+  //TODO: Add wait request stalls later.
+  assign stall = stall_alu;
   fsm fsm (
       .clk(clk),
       .reset_i(reset),
@@ -71,11 +73,16 @@ module mips_cpu_bus (
       .reg_a3_sel_o(reg_a3_sel)
   );
 
-  assign pc_i = read_data_1;  // TODO: For JR only. Change if required.
+  // TODO: For JR only. Change if required.
+  assign pc_i = rs_regfile_data;
+  // TODO: Add proper control logic for when branch conditions are met.
+  assign b_cond_met = 1'b0;
+
   pc pc (
       .clk(clk),
-      .reset_i(reset),
-      .wen_i(pc_wen),
+      .reset(reset),
+      .wen(pc_wen),
+      .b_cond_met(b_cond_met),
       .pc_i(pc_i),
       .pc_o(pc_o)
   );
@@ -105,33 +112,32 @@ module mips_cpu_bus (
       .addr_3_i(addr_3),
       .write_data_3_i(write_data_3),
       .write_enable_i(reg_wen),
-      .read_data_1_o(read_data_1),
-      .read_data_2_o(read_data_2)
+      .read_data_1_o(rs_regfile_data),
+      .read_data_2_o(rt_regfile_data)
   );
 
   alu alu (
       .clk(clk),
-      .opcocde_i(opcode),
+      .opcode_i(opcode),
       .funct_i(funct),
-      .rs_i(rs),
-      .rt_i(rt),
+      .rs_i(rs_regfile_data),
+      .rt_i(rt_regfile_data),
       .immediate_i(immediate),
-      .rd_o(rd_data),
-      .rt_o(rt_data),
-      .effective_address_o(effective_address),
+      .rd_o(rd_data_d),
+      .rt_o(rt_data_d),
       .mfhi_o(mfhi),
-      .mflo_i(mflo),
+      .mflo_o(mflo),
       .stall_o(stall_alu)
   );
   // TODO: Add support for MFHI/MFLO later.
   // TODO: Remove when ALU has a single output.
-  assign alu_out = (reg_a3_sel == 1) ? rd_data : rt_data;
+  assign alu_out = (reg_a3_sel == 1) ? rd_data_d : rt_data_d;
 
   /* Other IO/IN. */
   assign active = 1;  //TODO: Think of implementation.
   assign register_v0 = 0;  //TODO: Fish out signal from Reg File.
   assign address = (ram_a_sel == 1) ? effective_address : pc_o;
-  assign writedata = read_data_2;
+  assign writedata = rt_data_d;
   assign byteenable = 4'b1111;  //TODO: Change when LB instructions are implemented.
 
 endmodule

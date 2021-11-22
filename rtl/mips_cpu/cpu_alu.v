@@ -6,17 +6,18 @@ module alu (
     input opcode_t opcode_i,
     input func_t   funct_i,
 
-    input logic [31:0] rs_i,
-    input logic [31:0] rt_i,
+    input size_t rs_i,
+    input size_t rt_i,
     input logic [15:0] immediate_i,
 
-    output logic [31:0] rd_o,
-    output logic [31:0] rt_o,
-    output logic [31:0] effective_address_o,
+    output size_t rd_o,
+    output size_t rt_o,
+    output size_t effective_address_o,
 
-    output logic [31:0] mfhi_o,
-    output logic [31:0] mflo_o,
-    output logic stall_o
+
+    output size_t mfhi_o,
+    output size_t mflo_o,
+    output logic  stall_o
 );
 
   logic [63:0] mf_d;
@@ -25,20 +26,20 @@ module alu (
   assign mfhi_o = mf_q[63:32];
   assign mflo_o = mf_q[31:0];
 
-  function [31:0] signextend16to32(input [15:0] x);
+  function size_t signextend16to32(input [15:0] x);
     begin
       return x[15] == 1 ? {16'b1, x} : {16'b0, x};
     end
   endfunction
 
-  function [31:0] zeroextend16to32(input [15:0] x);
+  function size_t zeroextend16to32(input [15:0] x);
     begin
       return {16'b0, x};
     end
   endfunction
 
-  logic [31:0] sign_extended_imm;
-  logic [31:0] zero_extended_imm;
+  size_t sign_extended_imm;
+  size_t zero_extended_imm;
 
   assign sign_extended_imm = signextend16to32(immediate_i);
   assign zero_extended_imm = zeroextend16to32(immediate_i);
