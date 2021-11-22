@@ -5,14 +5,16 @@ BUILD_CMD := iverilog -Wall -g 2012 rtl/**/*.v rtl/*.v
 
 all: clean build test run
 
-clean: 
+clean:
 	@rm -f bin/*
 
-build: 
+build:
+	@mkdir -p bin
 	@$(BUILD_CMD) -o bin/mips_cpu
 
 TESTFILES := $(wildcard rtl/**/*_tb.v) $(wildcard rtl/*_tb.v)
 test:
+	@mkdir -p bin
 	@for t in $(TESTFILES); do \
 		tb=$${t##*/}; \
 		tb=$${tb%.v}; \
