@@ -6,7 +6,7 @@ on:
   pull_request:
 
 jobs:
-  build:
+  build_and_test:
     runs-on: ubuntu-20.04
     container:
       image: ghcr.io/jpnock/verilog-cpu/builder:latest
