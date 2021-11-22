@@ -18,10 +18,11 @@ module control (
   // TODO: Add logic for more instructions.
 
   always_comb begin
+    pc_wen_o = (state_i == EXEC2) ? 1 : 0;
+    ir_wen_o = (state_i == EXEC1) ? 1 : 0;
+
     case (opcode_i)
       OP_SW: begin
-        pc_wen_o = (state_i == EXEC2) ? 1 : 0;
-        ir_wen_o = (state_i == EXEC1) ? 1 : 0;
         ram_wen_o = (state_i == EXEC2) ? 1 : 0;
         ram_rds_o = (state_i == FETCH) ? 1 : 0;
         reg_wen_o = 0;
@@ -31,8 +32,6 @@ module control (
         reg_a3_sel_o = 1'bx;
       end
       OP_LW: begin
-        pc_wen_o = (state_i == EXEC2) ? 1 : 0;
-        ir_wen_o = (state_i == EXEC1) ? 1 : 0;
         ram_wen_o = 0;
         ram_rds_o = ((state_i == FETCH) || (state_i == EXEC1)) ? 1 : 0;
         reg_wen_o = (state_i == EXEC2) ? 1 : 0;
@@ -42,8 +41,6 @@ module control (
         reg_a3_sel_o = 0;
       end
       OP_ADDIU: begin
-        pc_wen_o = (state_i == EXEC2) ? 1 : 0;
-        ir_wen_o = (state_i == EXEC1) ? 1 : 0;
         ram_wen_o = 0;
         ram_rds_o = (state_i == FETCH) ? 1 : 0;
         reg_wen_o = (state_i == EXEC2) ? 1 : 0;
@@ -55,8 +52,6 @@ module control (
       OP_SPECIAL: begin
         case (function_i)
           FUNC_JR: begin
-            pc_wen_o = (state_i == EXEC2) ? 1 : 0;
-            ir_wen_o = (state_i == EXEC1) ? 1 : 0;
             ram_wen_o = 0;
             ram_rds_o = (state_i == FETCH) ? 1 : 0;
             reg_wen_o = 0;
@@ -66,8 +61,6 @@ module control (
             reg_a3_sel_o = 0;
           end
           FUNC_ADDU: begin
-            pc_wen_o = (state_i == EXEC2) ? 1 : 0;
-            ir_wen_o = (state_i == EXEC1) ? 1 : 0;
             ram_wen_o = 0;
             ram_rds_o = (state_i == FETCH) ? 1 : 0;
             reg_wen_o = (state_i == EXEC2) ? 1 : 0;
