@@ -97,7 +97,7 @@ module mips_cpu_bus (
       .instr_i(readdata),
       .opcode_o(opcode),
       .funct_o(funct),
-      .shift_o(shift), // TODO: Remove if not used.
+      .shift_o(shift),  // TODO: Remove if not used.
       .rs_o(rs),
       .rt_o(rt),
       .rd_o(rd),
