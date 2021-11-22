@@ -15,6 +15,9 @@ package codes;
   // This can be found on page 189, A-177 of
   // https://www.cs.cmu.edu/afs/cs/academic/class/15740-f97/public/doc/mips-isa.pdf
   typedef enum logic [5:0] {
+    // This doesn't exist in MIPS but it's here for the opcode typecast
+    OP_INVALID = 6'b111111,
+
     // 000XXX
     OP_SPECIAL = 6'b000000,
     OP_REGIMM  = 6'b000001,
@@ -54,6 +57,9 @@ package codes;
 
   // These were generated using James' genfunc.py
   typedef enum logic [5:0] {
+    // This doesn't exist in MIPS but it's here for the func typecast
+    FUNC_INVALID = 6'b111111,
+
     // 000XXX
     FUNC_SLL  = 6'b000000,
     FUNC_SRL  = 6'b000010,
