@@ -32,9 +32,6 @@ module ir (
         end else begin
             data = ihold;
         end
-    end
-
-    always_comb begin
       opcode_o = data[31:26];
       target_o = data[25:0];
       rs_o = data[25:21];
