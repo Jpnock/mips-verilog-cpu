@@ -14,7 +14,7 @@ WORKDIR /tmp/iverilog-build-dir/iverilog
 RUN git checkout ef01dd1e8161b6ee8bf9549acfa0fefcd1ba8dcb
 RUN chmod +x ./autoconf.sh
 RUN ./autoconf.sh
-RUN chmod +x .configure
+RUN chmod +x ./configure
 RUN ./configure
 RUN make
 RUN make install
