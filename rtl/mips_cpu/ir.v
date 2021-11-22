@@ -21,7 +21,9 @@ module ir (
     size_t data;
 
     always_ff @(posedge clk) begin
-        if (state_o == EXEC1) begin
+        if (reset_i) begin
+            ihold <= 0;
+        end else if (state_o == EXEC1) begin
             ihold <= instr_i;
         end
     end 
