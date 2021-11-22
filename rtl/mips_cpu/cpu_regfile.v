@@ -29,13 +29,8 @@ module regfile (
   end
 
   always_comb begin
-    if (reset_i == 1) begin
-      read_data_1_o = 0;
-      read_data_2_o = 0;
-    end else begin
-      read_data_1_o = regs[addr_1_i];
-      read_data_2_o = regs[addr_2_i];
-    end
+    read_data_1_o = regs[addr_1_i];
+    read_data_2_o = regs[addr_2_i];
   end
 
 endmodule
