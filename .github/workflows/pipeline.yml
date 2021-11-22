@@ -1,0 +1,20 @@
+name: Build and Test
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+
+jobs:
+  build_image:
+    runs-on: ubuntu-20.04
+    container:
+      image: ghcr.io/jpnock/verilog-cpu/builder:latest
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - name: Build
+        id: build
+        run: |
+          make

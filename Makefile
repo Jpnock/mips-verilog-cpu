@@ -9,4 +9,5 @@ build:
 	@iverilog -Wall -g 2012 -o bin/mips_cpu rtl/**/*.v rtl/*.v
 
 run:
-	@(./bin/mips_cpu && echo "Executed successfully") || echo "Execution failed with code $$?"
+	@./bin/mips_cpu
+	@echo "Executed successfully"
