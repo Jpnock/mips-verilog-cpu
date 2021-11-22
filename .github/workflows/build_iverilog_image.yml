@@ -12,6 +12,7 @@ jobs:
         with:
           file: build/Dockerfile
           push: true
-          tags: verilog-cpu/builder:latest
+          registry: gchr.io
+          tags: ghcr.io/jpnock/verilog-cpu/builder:latest
           secrets: |
             GIT_AUTH_TOKEN=${{ secrets.GITHUB_TOKEN }}
