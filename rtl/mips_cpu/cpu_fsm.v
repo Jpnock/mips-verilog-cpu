@@ -16,10 +16,10 @@ module fsm (
     if (reset_i == 1) begin
       state_d = FETCH;
     end else begin
-      if (stall_i == 1) begin
-        state_d = state_q;
-      end else if (halt_i == 1) begin
+      if ((halt_i == 1) || (state_q == HALT)) begin
         state_d = HALT;
+      end else if (stall_i == 1) begin
+        state_d = state_q;
       end else begin
         case (state_q)
           FETCH:   state_d = EXEC1;
