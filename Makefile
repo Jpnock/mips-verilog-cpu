@@ -10,7 +10,7 @@ clean:
 
 build:
 	@mkdir -p bin
-	@$(BUILD_CMD) -o bin/mips_cpu
+	@$(BUILD_CMD) -o bin/mips_cpu.out
 
 TESTFILES := $(wildcard rtl/**/*_tb.v) $(wildcard rtl/*_tb.v)
 test:
@@ -33,5 +33,6 @@ test:
 
 
 run:
-	@./bin/mips_cpu > /dev/null
-	@echo "Executed successfully"
+	@printf "\033[34;1m▶\033[0m Running ./bin/mips_cpu.out\n"
+	@./bin/mips_cpu.out > ./bin/mips_cpu.log || (cat ./bin/mips_cpu.log; exit 1;)
+	@printf "\033[34;1m ...\033[0m Executed successfully\n"
