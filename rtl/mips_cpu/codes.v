@@ -8,7 +8,8 @@ package codes;
   typedef enum logic [1:0] {
     FETCH = 2'b00,
     EXEC1 = 2'b01,
-    EXEC2 = 2'b10
+    EXEC2 = 2'b10,
+    HALT  = 2'b11
   } state_t;
 
   // opcode_t defines the 6-bit opcode mapping.
