@@ -1,3 +1,5 @@
+SHELL := bash -euo pipefail
+
 .PHONY: all clean build test run
 
 M := $(shell printf "\033[34;1m▶\033[0m")
@@ -11,25 +13,14 @@ clean:
 build:
 	@printf "\033[34;1m▶\033[0m Building\n"
 	@mkdir -p bin
-	@$(BUILD_CMD) -o bin/mips_cpu.out
+	@$(BUILD_CMD) -o bin/mips_cpu.out 2>&1 | sed 's/^/  /'
 	@printf "\033[34;1m ...\033[0m built\n"
 
 TESTFILES := $(wildcard rtl/**/*_tb.v) $(wildcard rtl/*_tb.v)
 test:
 	@mkdir -p bin
 	@for t in $(TESTFILES); do \
-		tb=$${t##*/}; \
-		tb=$${tb%.v}; \
-		out="bin/$$tb.out"; \
-		outlog="bin/$$tb.log"; \
-		printf "\033[34;1m▶\033[0m testing %s\n" $$tb; \
-		$(BUILD_CMD) -s "$$tb" -o "$$out"; \
-		./$$out > "$$outlog"; \
-		grep "ERROR:" "$$outlog" > /dev/null && \
-			printf "\033[34;1m ...\033[0m failed %s\n" && \
-			cat "$$outlog" && \
-			exit 1; \
-		printf "\033[34;1m ...\033[0m passed\n"; \
+		(./test/run_verilog_testbench.sh "$$t" || exit 1); \
 	done;
 
 run:
