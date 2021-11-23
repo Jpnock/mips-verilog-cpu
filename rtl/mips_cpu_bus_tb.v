@@ -15,17 +15,29 @@ module mips_cpu_bus_tb ();
 
   initial begin
     $dumpfile("mips_cpu_bus_tb.vcd");
-    $dumpvars(0, mips_cpu_bus);
+    $dumpvars(0, mips_cpu_bus_tb);
 
     clk = 0;
     #1;
     repeat (256) begin
       #2 clk = !clk;
     end
+    $finish;
   end
 
   initial begin
-    /* Insert testbench assert statements */
+    reset = 1;
+    @(posedge clk);
+    @(posedge clk);
+    @(posedge clk);
+    @(posedge clk);
+    @(posedge clk);
+    @(posedge clk);
+    @(posedge clk);
+    reset = 0;
+    @(posedge clk);
+    @(posedge clk);
+    @(posedge clk);
   end
 
   mips_cpu_bus mips_cpu_bus (
@@ -42,7 +54,7 @@ module mips_cpu_bus_tb ();
       .readdata(readdata)
   );
 
-  cpu_ram #("") cpu_ram (
+  cpu_ram cpu_ram (
       .clk(clk),
       .read(read),
       .write(write),

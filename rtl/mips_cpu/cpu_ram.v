@@ -21,15 +21,13 @@ module cpu_ram (
   size_t ram[1000-1:0];
 
   initial begin
-    if (RAM_FILE != "") begin
-      // TODO: check endianness
-      $readmemh(RAM_FILE, ram, 0, 3);
-      // print out a few contents of the ram
-      for (integer i = 0; i < 10; i++) begin
-        $display("%b", ram[i]);
-      end
-
+    // TODO: check endianness
+    $readmemh(RAM_FILE, ram, 0, 3);
+    // print out a few contents of the ram
+    for (integer i = 0; i < 10; i++) begin
+      $display("%b", ram[i]);
     end
+
   end
 
   size_t word_address;
