@@ -3,14 +3,16 @@
 M := $(shell printf "\033[34;1m▶\033[0m")
 BUILD_CMD := iverilog -Wall -g 2012 rtl/**/*.v rtl/*.v
 
-all: clean build test run
+all: clean build test
 
 clean:
 	@rm -f bin/*
 
 build:
+	@printf "\033[34;1m▶\033[0m Building\n"
 	@mkdir -p bin
 	@$(BUILD_CMD) -o bin/mips_cpu.out
+	@printf "\033[34;1m ...\033[0m built\n"
 
 TESTFILES := $(wildcard rtl/**/*_tb.v) $(wildcard rtl/*_tb.v)
 test:
@@ -29,8 +31,6 @@ test:
 			exit 1; \
 		printf "\033[34;1m ...\033[0m passed\n"; \
 	done;
-
-
 
 run:
 	@printf "\033[34;1m▶\033[0m Running ./bin/mips_cpu.out\n"
