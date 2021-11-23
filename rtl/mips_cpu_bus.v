@@ -51,9 +51,10 @@ module mips_cpu_bus (
 
   //TODO: Add wait request stalls later.
   assign stall = stall_alu;
-  assign halt  = (pc == 0) ? 1 : 0;
+  assign halt  = (pc_o == 0) ? 1 : 0;
   fsm fsm (
       .clk(clk),
+      .halt_i(halt),
       .reset_i(reset),
       .stall_i(stall),
       .state_o(state)
@@ -78,7 +79,7 @@ module mips_cpu_bus (
   // TODO: For JR only. Change if required.
   assign pc_i = rs_regfile_data;
   // TODO: Add proper control logic for when branch conditions are met.
-  assign b_cond_met = (opcode == OPCODE_JR) ? 1 : 0;
+  assign b_cond_met = ((opcode == OP_SPECIAL) && (funct == FUNC_JR)) ? 1 : 0;
 
   pc pc (
       .clk(clk),
