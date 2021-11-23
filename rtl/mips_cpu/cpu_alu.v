@@ -12,10 +12,12 @@ module alu (
 
     output size_t rd_o,
     output size_t rt_o,
+    output size_t effective_address_o,
+
 
     output size_t mfhi_o,
     output size_t mflo_o,
-    output logic stall_o
+    output logic  stall_o
 );
 
   logic [63:0] mf_d;
@@ -111,11 +113,12 @@ module alu (
           rt_o = 0;
         end
       end
-      OP_ANDI:  rt_o = rs_i & zero_extended_imm;
-      OP_ORI:   rt_o = rs_i | zero_extended_imm;
-      OP_XORI:  rt_o = rs_i ^ zero_extended_imm;
+      OP_ANDI: rt_o = rs_i & zero_extended_imm;
+      OP_ORI: rt_o = rs_i | zero_extended_imm;
+      OP_XORI: rt_o = rs_i ^ zero_extended_imm;
       // TODO: LUI mentions something about sign extension but that doesn't make sense in this context.
-      OP_LUI:   rt_o = {immediate_i << 16, 16'b0};
+      OP_LUI: rt_o = {immediate_i << 16, 16'b0};
+      OP_LW, OP_SW: effective_address_o = sign_extended_imm + rs_i;
     endcase
   end
 
