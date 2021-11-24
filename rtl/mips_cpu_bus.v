@@ -60,6 +60,13 @@ module mips_cpu_bus (
       .state_o(state)
   );
 
+`ifdef DEBUG
+  always_ff @(posedge clk) begin
+    if (halt) begin
+      $display("Halt output (active %d): %08h", active, register_v0);
+    end
+  end
+`endif
 
   control control (
       .state_i(state),

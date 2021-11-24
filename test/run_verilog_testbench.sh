@@ -11,7 +11,7 @@ outlog="./bin/${tb_name}.log"
 
 printf "$l▶$ll building test: ${tb_name}\n" $
 
-iverilog -Wall -g 2012 rtl/**/*.v rtl/*.v -s "${tb_name}" -o "$out" 2>&1 | sed 's/^/  /'
+iverilog -DDEBUG -Wall -g 2012 rtl/**/*.v rtl/*.v -s "${tb_name}" -o "$out" 2>&1 | sed 's/^/  /'
 
 printf "$l...$ll built\n"
 
