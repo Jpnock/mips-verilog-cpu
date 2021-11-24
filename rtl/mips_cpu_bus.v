@@ -39,7 +39,14 @@ module mips_cpu_bus (
 
   // RegFile
   regaddr_t addr_3;
-  size_t rs_regfile_data, rs_data_d, rt_regfile_data, rt_data_d, write_data_3, rd_data_d;
+  size_t
+      rs_regfile_data,
+      rs_data_d,
+      rt_regfile_data,
+      rt_data_d,
+      write_data_3,
+      rd_data_d,
+      read_data_reg_v0;
 
 
   // ALU
@@ -125,7 +132,8 @@ module mips_cpu_bus (
       .write_data_3_i(write_data_3),
       .write_enable_i(reg_wen),
       .read_data_1_o(rs_regfile_data),
-      .read_data_2_o(rt_regfile_data)
+      .read_data_2_o(rt_regfile_data),
+      .read_data_reg_v0_o(read_data_reg_v0)
   );
 
   alu alu (
@@ -147,7 +155,7 @@ module mips_cpu_bus (
 
   /* Other IO/IN. */
   assign active = 1;  //TODO: Think of implementation.
-  assign register_v0 = 0;  //TODO: Fish out signal from Reg File.
+  assign register_v0 = read_data_reg_v0;
   assign address = (ram_a_sel == 1) ? alu_out : pc_o;
   assign writedata = rt_data_d;
   assign byteenable = 4'b1111;  //TODO: Change when LB instructions are implemented.
