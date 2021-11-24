@@ -12,7 +12,11 @@ module regfile (
     output size_t read_data_2_o
 );
 
-  size_t regs[4:0];
+  // 32 times 32-bit registers
+  size_t regs[31:0];
+
+  assign read_data_1_o = regs[addr_1_i];
+  assign read_data_2_o = regs[addr_2_i];
 
   always_ff @(posedge clk) begin
     if (reset_i == 1) begin
@@ -24,11 +28,6 @@ module regfile (
         regs[addr_3_i] <= write_data_3_i;
       end
     end
-  end
-
-  always_comb begin
-    read_data_1_o = regs[addr_1_i];
-    read_data_2_o = regs[addr_2_i];
   end
 
 endmodule
