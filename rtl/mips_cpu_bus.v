@@ -17,7 +17,13 @@ module mips_cpu_bus (
     input logic [31:0] readdata
 );
 
-  /* Declarations */
+  function automatic size_t swap_endian(size_t to_swap);
+    swap_endian = {to_swap[7:0], to_swap[15:8], to_swap[23:16], to_swap[31:24]};
+  endfunction
+
+  // TODO: we swap endianness all the time here: will this break single byte loads?
+  size_t readdata_bigendian;
+  assign readdata_bigendian = swap_endian(readdata);
 
   // FSM
   logic stall, halt;
@@ -110,7 +116,7 @@ module mips_cpu_bus (
       .state_i(state),
       .wen_i(ir_wen),
       .reset_i(reset),
-      .instr_i(readdata),
+      .instr_i(readdata_bigendian),
       .opcode_o(opcode),
       .funct_o(funct),
       .shift_o(shift),  // TODO: Remove if not used.
@@ -121,7 +127,10 @@ module mips_cpu_bus (
   );
 
   assign addr_3 = (reg_a3_sel == 1) ? rd : rt;
-  assign write_data_3 = (reg_wd_sel == 1) ? alu_out : readdata;
+
+  // TODO: we use big endian all the time but does this apply for single byte
+  // store operations?
+  assign write_data_3 = (reg_wd_sel == 1) ? alu_out : readdata_bigendian;
 
   regfile regfile (
       .clk(clk),
@@ -158,7 +167,10 @@ module mips_cpu_bus (
   assign active = state != HALT;
   assign register_v0 = read_data_reg_v0;
   assign address = (ram_a_sel == 1) ? effective_address : pc_o;
-  assign writedata = rt_data_d;
+
+  // TODO: we swap endianness all the time here: will this break single byte
+  // stores?
+  assign writedata = swap_endian(rt_data_d);
   assign byteenable = 4'b1111;  //TODO: Change when LB instructions are implemented.
 
 endmodule
