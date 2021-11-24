@@ -20,11 +20,11 @@ module mips_cpu_bus (
   /* Declarations */
 
   // FSM
-  logic stall;
-  state_t state;
+  logic stall, halt;
+  state_t  state;
 
   // Control
-  func_t funct;
+  func_t   funct;
   opcode_t opcode;
   logic pc_wen, ir_wen, reg_wen, src_b_sel, ram_a_sel, reg_wd_sel, reg_a3_sel;
 
@@ -39,25 +39,41 @@ module mips_cpu_bus (
 
   // RegFile
   regaddr_t addr_3;
-  size_t rs_regfile_data, rs_data_d, rt_regfile_data, rt_data_d, write_data_3, rd_data_d;
+  size_t
+      rs_regfile_data,
+      rs_data_d,
+      rt_regfile_data,
+      rt_data_d,
+      write_data_3,
+      rd_data_d,
+      read_data_reg_v0;
 
 
   // ALU
   logic stall_alu;
-  size_t mfhi, mflo, alu_out, effective_address;
+  size_t mfhi, mflo, alu_out;
 
 
   /* Modules */
 
   //TODO: Add wait request stalls later.
   assign stall = stall_alu;
+  assign halt  = (pc_o == 0) ? 1 : 0;
   fsm fsm (
       .clk(clk),
+      .halt_i(halt),
       .reset_i(reset),
       .stall_i(stall),
       .state_o(state)
   );
 
+`ifdef DEBUG
+  always_ff @(posedge clk) begin
+    if (halt) begin
+      $display("Halt output (active %d): %08h", active, register_v0);
+    end
+  end
+`endif
 
   control control (
       .state_i(state),
@@ -77,7 +93,7 @@ module mips_cpu_bus (
   // TODO: For JR only. Change if required.
   assign pc_i = rs_regfile_data;
   // TODO: Add proper control logic for when branch conditions are met.
-  assign b_cond_met = 1'b0;
+  assign b_cond_met = ((opcode == OP_SPECIAL) && (funct == FUNC_JR)) ? 1 : 0;
 
   pc pc (
       .clk(clk),
@@ -116,7 +132,8 @@ module mips_cpu_bus (
       .write_data_3_i(write_data_3),
       .write_enable_i(reg_wen),
       .read_data_1_o(rs_regfile_data),
-      .read_data_2_o(rt_regfile_data)
+      .read_data_2_o(rt_regfile_data),
+      .read_data_reg_v0_o(read_data_reg_v0)
   );
 
   alu alu (
@@ -128,7 +145,6 @@ module mips_cpu_bus (
       .immediate_i(immediate),
       .rd_o(rd_data_d),
       .rt_o(rt_data_d),
-      .effective_address_o(effective_address),
       .mfhi_o(mfhi),
       .mflo_o(mflo),
       .stall_o(stall_alu)
@@ -138,9 +154,9 @@ module mips_cpu_bus (
   assign alu_out = (reg_a3_sel == 1) ? rd_data_d : rt_data_d;
 
   /* Other IO/IN. */
-  assign active = 1;  //TODO: Think of implementation.
-  assign register_v0 = 0;  //TODO: Fish out signal from Reg File.
-  assign address = (ram_a_sel == 1) ? effective_address : pc_o;
+  assign active = state != HALT;
+  assign register_v0 = read_data_reg_v0;
+  assign address = (ram_a_sel == 1) ? alu_out : pc_o;
   assign writedata = rt_data_d;
   assign byteenable = 4'b1111;  //TODO: Change when LB instructions are implemented.
 

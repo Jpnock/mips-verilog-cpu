@@ -69,12 +69,19 @@ module control (
             reg_a3_sel_o = (state_i == EXEC2) ? 1 : 0;
           end
           default: begin
-            $fatal(0, "Instruction undefined.");
+            //$fatal(0, "Instruction undefined.");
           end
         endcase
       end
       default: begin
-        $fatal(0, "Instruction undefined.");
+        ram_wen_o = 0;
+        ram_rds_o = 0;
+        reg_wen_o = 0;
+        src_b_sel_o = 0;
+        ram_a_sel_o = 0;
+        reg_wd_sel_o = 0;
+        reg_a3_sel_o = 0;
+        //$fatal(0, "Instruction undefined.");
       end
     endcase
   end

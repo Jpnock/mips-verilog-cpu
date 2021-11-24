@@ -24,6 +24,16 @@ module ir (
     if (reset_i) begin
       ihold <= 0;
     end else if (state_i == EXEC1) begin
+`ifdef DEBUG
+      if (opcode_o == OP_SPECIAL) begin
+        func_display(funct_o);
+        $display("%08h", data);
+      end else begin
+        opcode_display(opcode_o);
+        $display("%08h, %06b, %06b", data, opcode_o, funct_o);
+      end
+`endif
+
       ihold <= instr_i;
     end
   end
@@ -74,6 +84,42 @@ module ir (
     endcase
   endfunction
 
+`ifdef DEBUG
+  function automatic logic opcode_display(opcode_t i);
+    case (i)
+      OP_SPECIAL: $display("Got opcode OP_SPECIAL");
+      OP_REGIMM:  $display("Got opcode OP_REGIMM");
+      OP_J:       $display("Got opcode OP_J");
+      OP_JAL:     $display("Got opcode OP_JAL");
+      OP_BEQ:     $display("Got opcode OP_BEQ");
+      OP_BNE:     $display("Got opcode OP_BNE");
+      OP_BLEZ:    $display("Got opcode OP_BLEZ");
+      OP_BGTZ:    $display("Got opcode OP_BGTZ");
+      OP_ADDI:    $display("Got opcode OP_ADDI");
+      OP_ADDIU:   $display("Got opcode OP_ADDIU");
+      OP_SLTI:    $display("Got opcode OP_SLTI");
+      OP_SLTIU:   $display("Got opcode OP_SLTIU");
+      OP_ANDI:    $display("Got opcode OP_ANDI");
+      OP_ORI:     $display("Got opcode OP_ORI");
+      OP_XORI:    $display("Got opcode OP_XORI");
+      OP_LUI:     $display("Got opcode OP_LUI");
+      OP_LB:      $display("Got opcode OP_LB");
+      OP_LH:      $display("Got opcode OP_LH");
+      OP_LWL:     $display("Got opcode OP_LWL");
+      OP_LW:      $display("Got opcode OP_LW");
+      OP_LBU:     $display("Got opcode OP_LBU");
+      OP_LHU:     $display("Got opcode OP_LHU");
+      OP_LWR:     $display("Got opcode OP_LWR");
+      OP_SB:      $display("Got opcode OP_SB");
+      OP_SH:      $display("Got opcode OP_SH");
+      OP_SWL:     $display("Got opcode OP_SWL");
+      OP_SW:      $display("Got opcode OP_SW");
+      OP_SWR:     $display("Got opcode OP_SWR");
+      default:    $display("Got opcode OP_INVALID");
+    endcase
+  endfunction
+`endif
+
   function automatic func_t logic_to_func(logic [5:0] i);
     case (i)
       FUNC_SLL:     logic_to_func = FUNC_SLL;
@@ -107,4 +153,41 @@ module ir (
       default:      logic_to_func = FUNC_INVALID;
     endcase
   endfunction
+
+`ifdef DEBUG
+  function automatic logic func_display(func_t i);
+    case (i)
+      FUNC_SLL:     $display("Got SPECIAL: FUNC_SLL");
+      FUNC_SRL:     $display("Got SPECIAL: FUNC_SRL");
+      FUNC_SRA:     $display("Got SPECIAL: FUNC_SRA");
+      FUNC_SLLV:    $display("Got SPECIAL: FUNC_SLLV");
+      FUNC_SRLV:    $display("Got SPECIAL: FUNC_SRLV");
+      FUNC_SRAV:    $display("Got SPECIAL: FUNC_SRAV");
+      FUNC_JR:      $display("Got SPECIAL: FUNC_JR");
+      FUNC_JALR:    $display("Got SPECIAL: FUNC_JALR");
+      FUNC_SYSCALL: $display("Got SPECIAL: FUNC_SYSCALL");
+      FUNC_BREAK:   $display("Got SPECIAL: FUNC_BREAK");
+      FUNC_MFHI:    $display("Got SPECIAL: FUNC_MFHI");
+      FUNC_MTHI:    $display("Got SPECIAL: FUNC_MTHI");
+      FUNC_MFLO:    $display("Got SPECIAL: FUNC_MFLO");
+      FUNC_MTLO:    $display("Got SPECIAL: FUNC_MTLO");
+      FUNC_MULT:    $display("Got SPECIAL: FUNC_MULT");
+      FUNC_MULTU:   $display("Got SPECIAL: FUNC_MULTU");
+      FUNC_DIV:     $display("Got SPECIAL: FUNC_DIV");
+      FUNC_DIVU:    $display("Got SPECIAL: FUNC_DIVU");
+      FUNC_ADD:     $display("Got SPECIAL: FUNC_ADD");
+      FUNC_ADDU:    $display("Got SPECIAL: FUNC_ADDU");
+      FUNC_SUB:     $display("Got SPECIAL: FUNC_SUB");
+      FUNC_SUBU:    $display("Got SPECIAL: FUNC_SUBU");
+      FUNC_AND:     $display("Got SPECIAL: FUNC_AND");
+      FUNC_OR:      $display("Got SPECIAL: FUNC_OR");
+      FUNC_XOR:     $display("Got SPECIAL: FUNC_XOR");
+      FUNC_NOR:     $display("Got SPECIAL: FUNC_NOR");
+      FUNC_SLT:     $display("Got SPECIAL: FUNC_SLT");
+      FUNC_SLTU:    $display("Got SPECIAL: FUNC_SLTU");
+      default:      $display("Got SPECIAL: FUNC_INVALID");
+    endcase
+  endfunction
+`endif
+
 endmodule

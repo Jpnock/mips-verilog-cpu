@@ -2,6 +2,7 @@ import codes::*;
 
 module fsm (
     input  logic   clk,
+    input  logic   halt_i,
     input  logic   reset_i,
     input  logic   stall_i,
     output state_t state_o
@@ -15,12 +16,14 @@ module fsm (
     if (reset_i == 1) begin
       state_d = FETCH;
     end else begin
-      if (stall_i == 1) begin
+      if ((halt_i == 1) || (state_q == HALT)) begin
+        state_d = HALT;
+      end else if (stall_i == 1) begin
         state_d = state_q;
       end else begin
         case (state_q)
-          FETCH: state_d = EXEC1;
-          EXEC1: state_d = EXEC2;
+          FETCH:   state_d = EXEC1;
+          EXEC1:   state_d = EXEC2;
           default: state_d = FETCH;
         endcase
       end

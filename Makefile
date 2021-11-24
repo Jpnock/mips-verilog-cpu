@@ -3,7 +3,7 @@ SHELL := bash -euo pipefail
 .PHONY: all clean build test run
 
 M := $(shell printf "\033[34;1m▶\033[0m")
-BUILD_CMD := iverilog -Wall -g 2012 rtl/**/*.v rtl/*.v
+BUILD_CMD := iverilog -DDEBUG -Wall -g 2012 rtl/**/*.v rtl/*.v
 
 all: clean build test
 
