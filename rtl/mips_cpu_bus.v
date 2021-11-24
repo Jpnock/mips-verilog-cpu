@@ -154,7 +154,7 @@ module mips_cpu_bus (
   assign alu_out = (reg_a3_sel == 1) ? rd_data_d : rt_data_d;
 
   /* Other IO/IN. */
-  assign active = 1;  //TODO: Think of implementation.
+  assign active = state != HALT;
   assign register_v0 = read_data_reg_v0;
   assign address = (ram_a_sel == 1) ? alu_out : pc_o;
   assign writedata = rt_data_d;
