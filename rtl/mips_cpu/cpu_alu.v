@@ -119,6 +119,13 @@ module alu (
       // TODO: LUI mentions something about sign extension but that doesn't make sense in this context.
       OP_LUI: rt_o = {immediate_i << 16, 16'b0};
       OP_LW, OP_SW: effective_address_o = sign_extended_imm + rs_i;
+      // TODO: we need to be careful here if we're doing non 32-bit store
+      // operations (e.g. SH, SB). The representation of bytes or half-words
+      // will always be presented from bit 32, downward. For example an SB which
+      // stores 0xFF needs to be represented as 0xFF000000. A SH which stores
+      // 0x4142 will be represented as 0x41420000. These values need shifting to
+      // the correct location before outputting them. The same applies to loads,
+      // however they may be handled elsewhere.
     endcase
   end
 
