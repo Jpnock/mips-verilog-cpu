@@ -21,7 +21,6 @@ module mips_cpu_bus (
     swap_endian = {to_swap[7:0], to_swap[15:8], to_swap[23:16], to_swap[31:24]};
   endfunction
 
-  // TODO: we swap endianness all the time here: will this break single byte loads?
   size_t readdata_bigendian;
   assign readdata_bigendian = swap_endian(readdata);
 
@@ -128,8 +127,12 @@ module mips_cpu_bus (
 
   assign addr_3 = (reg_a3_sel == 1) ? rd : rt;
 
-  // TODO: we use big endian all the time but does this apply for single byte
-  // store operations?
+  // TODO: we need to be careful here if we're doing non 32-bit load operations
+  // (e.g. LH, LB). The representation of bytes or half-words will always be
+  // presented from bit 32, downward. For example an LB which returns 0xFF will
+  // be represented in readdata_bigendian as 0xFF000000. A LH which returns
+  // 0x4142 will be represented in readdata_bigendian as 0x41420000. These
+  // values need shifting to the correct location before writing them.
   assign write_data_3 = (reg_wd_sel == 1) ? alu_out : readdata_bigendian;
 
   regfile regfile (
@@ -168,9 +171,11 @@ module mips_cpu_bus (
   assign register_v0 = read_data_reg_v0;
   assign address = (ram_a_sel == 1) ? effective_address : pc_o;
 
-  // TODO: we swap endianness all the time here: will this break single byte
-  // stores?
   assign writedata = swap_endian(rt_data_d);
-  assign byteenable = 4'b1111;  //TODO: Change when LB instructions are implemented.
+
+  // TODO: Change when LB instructions are implemented. See the detailed
+  // conversation here on how this should be produced:
+  // https://github.com/Jpnock/verilog-cpu/pull/26#issuecomment-979345783
+  assign byteenable = 4'b1111;
 
 endmodule
