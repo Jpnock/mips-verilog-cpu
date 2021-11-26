@@ -103,6 +103,9 @@ package codes;
   } func_t;
 
   typedef enum logic [4:0] {
+    // This doesn't exist in MIPS but it's here for the func typecast
+    REGIMM_INVALID = 5'b11111,
+
     // 00XXX
     REGIMM_BLTZ = 5'b00000,
     REGIMM_BGEZ = 5'b00001,
