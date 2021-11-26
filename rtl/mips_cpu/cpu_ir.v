@@ -8,6 +8,7 @@ module ir (
     input size_t instr_i,
     output opcode_t opcode_o,
     output func_t funct_o,
+    output regimm_t regimm_o,
     output logic [4:0] shift_o,
     output regaddr_t rs_o,
     output regaddr_t rt_o,
@@ -28,6 +29,8 @@ module ir (
       if (opcode_o == OP_SPECIAL) begin
         func_display(funct_o);
         $display("%08h", data);
+      end else if (opcode_o == OP_REGIMM) begin
+        regimm_display(regimm_o);
       end else begin
         opcode_display(opcode_o);
         $display("%08h, %06b, %06b", data, opcode_o, funct_o);
@@ -47,6 +50,7 @@ module ir (
   assign immediate_o = data[15:0];
   assign shift_o = data[10:6];
   assign funct_o = logic_to_func(data[5:0]);
+  assign regimm_o = logic_to_regimm(data[20:16]);
 
   // These functions are required as iverilog does not support typecasting
   // between logic and enum...
@@ -186,6 +190,28 @@ module ir (
       FUNC_SLT:     $display("Got SPECIAL: FUNC_SLT");
       FUNC_SLTU:    $display("Got SPECIAL: FUNC_SLTU");
       default:      $display("Got SPECIAL: FUNC_INVALID");
+    endcase
+  endfunction
+`endif
+
+  function automatic regimm_t logic_to_regimm(logic [4:0] i);
+    case (i)
+      REGIMM_BLTZ:   logic_to_regimm = REGIMM_BLTZ;
+      REGIMM_BGEZ:   logic_to_regimm = REGIMM_BGEZ;
+      REGIMM_BLTZAL: logic_to_regimm = REGIMM_BLTZAL;
+      REGIMM_BGEZAL: logic_to_regimm = REGIMM_BGEZAL;
+      default:       logic_to_regimm = REGIMM_INVALID;
+    endcase
+  endfunction
+
+`ifdef DEBUG
+  function automatic logic regimm_display(regimm_t i);
+    case (i)
+      REGIMM_BLTZ:   $display("Got REGIMM: REGIMM_BLTZ");
+      REGIMM_BGEZ:   $display("Got REGIMM: REGIMM_BGEZ");
+      REGIMM_BLTZAL: $display("Got REGIMM: REGIMM_BLTZAL");
+      REGIMM_BGEZAL: $display("Got REGIMM: REGIMM_BGEZAL");
+      default:       $display("Got REGIMM: REGIMM_INALID");
     endcase
   endfunction
 `endif

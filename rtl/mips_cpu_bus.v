@@ -31,6 +31,7 @@ module mips_cpu_bus (
   // Control
   func_t   funct;
   opcode_t opcode;
+  regimm_t regimm;
   logic pc_wen, ir_wen, reg_wen, src_b_sel, ram_a_sel, reg_wd_sel, reg_a3_sel;
 
   // PC
@@ -118,6 +119,7 @@ module mips_cpu_bus (
       .instr_i(readdata_bigendian),
       .opcode_o(opcode),
       .funct_o(funct),
+      .regimm_o(regimm),
       .shift_o(shift),  // TODO: Remove if not used.
       .rs_o(rs),
       .rt_o(rt),
