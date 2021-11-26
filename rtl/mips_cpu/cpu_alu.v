@@ -21,10 +21,11 @@ module alu (
 );
 
   logic [63:0] mf_d;
-  logic [63:0] mf_q;
+  size_t mfhi_d, mfhi_q;
+  size_t mflo_d, mflo_q;
 
-  assign mfhi_o = mf_q[63:32];
-  assign mflo_o = mf_q[31:0];
+  assign mfhi_o = mfhi_q;
+  assign mflo_o = mflo_q;
 
   function size_t signextend16to32(input [15:0] x);
     begin
@@ -81,15 +82,21 @@ module alu (
           FUNC_NOR:  rd_o = rs_i~|rt_i;
           FUNC_MULT: begin
             mf_d = $signed(rs_i) * $signed(rt_i);
+            mflo_d = mf_d[31:0];
+            mfhi_d = mf_d[63:32]];
           end
           FUNC_MULTU: begin
             mf_d = rs_i * rt_i;
+            mflo_d = mf_d[31:0];
+            mfhi_d = mf_d[63:32]];
           end
           FUNC_DIV: begin
-            $fatal(1, "DIV instruction not implemented");
+            mflo_d = $signed(rs_i) / $signed(rt_i);
+            mfhi_d = $signed(rs_i) % $signed(rt_i);
           end
           FUNC_DIVU: begin
-            $fatal(1, "DIVU instruction not implemented");
+            mflo_d = $unsigned(rs_i) / $unsigned(rt_i);
+            mfhi_d = $unsigned(rs_i) % $unsigned(rt_i);
           end
         endcase
       end
@@ -131,8 +138,9 @@ module alu (
 
   always_ff @(posedge clk) begin
     if (opcode_i == OP_SPECIAL) begin
-      if (funct_i == FUNC_MULT || funct_i == FUNC_MULTU) begin
-        mf_q <= mf_d;
+      if (funct_i == FUNC_MULT || funct_i == FUNC_MULTU || funct_i == FUNC_DIV || funct_i == FUNC_DIVU) begin
+        mflo_q <= mflo_d;
+        mfhi_q <= mflo_q;
       end
     end
   end
