@@ -83,12 +83,12 @@ module alu (
           FUNC_MULT: begin
             mf_d = $signed(rs_i) * $signed(rt_i);
             mflo_d = mf_d[31:0];
-            mfhi_d = mf_d[63:32]];
+            mfhi_d = mf_d[63:32];
           end
           FUNC_MULTU: begin
             mf_d = rs_i * rt_i;
             mflo_d = mf_d[31:0];
-            mfhi_d = mf_d[63:32]];
+            mfhi_d = mf_d[63:32];
           end
           FUNC_DIV: begin
             mflo_d = $signed(rs_i) / $signed(rt_i);
