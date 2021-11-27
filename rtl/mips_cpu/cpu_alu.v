@@ -140,7 +140,7 @@ module alu (
     if (opcode_i == OP_SPECIAL) begin
       if (funct_i == FUNC_MULT || funct_i == FUNC_MULTU || funct_i == FUNC_DIV || funct_i == FUNC_DIVU) begin
         mflo_q <= mflo_d;
-        mfhi_q <= mfhi_q;
+        mfhi_q <= mfhi_d;
       end
     end
   end
