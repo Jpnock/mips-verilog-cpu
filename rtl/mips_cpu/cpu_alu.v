@@ -95,12 +95,26 @@ module alu (
             if (rt_i == 0) begin
               mf_d = 0;
             end else begin
-              mf_d[31:0]  = $unsigned(rs_i) / $unsigned(rt_i);
-              mf_d[63:32] = $unsigned(rs_i) % $unsigned(rt_i);
+              mf_d[31:0]  = rs_i / rt_i;
+              mf_d[63:32] = rs_i % rt_i;
             end
           end
           FUNC_MTHI: mf_d[31:0] = rs_i;
           FUNC_MTLO: mf_d[63:32] = rs_i;
+          FUNC_SLT: begin
+            if ($signed(rs_i) < $signed(rt_i)) begin
+              rd_o = 1;
+            end else begin
+              rd_o = 0;
+            end
+          end
+          FUNC_SLTU: begin
+            if (rs_i < rt_i) begin
+              rd_o = 1;
+            end else begin
+              rd_o = 0;
+            end
+          end
         endcase
       end
       OP_ADDI: begin
