@@ -49,7 +49,7 @@ module control (
         ram_addr_sel_o |= isStateEXEC1;
         regfile_write_en_o |= isStateEXEC2;
       end
-      OP_ADDIU: begin
+      OP_ADDIU, OP_ANDI, OP_ORI, OP_SLTI, OPSLTIU, OP_XORI: begin
         regfile_write_en_o |= isStateEXEC2;
         src_b_sel_o |= isStateEXEC2;
         regfile_writedata_sel_o |= isStateEXEC2;
