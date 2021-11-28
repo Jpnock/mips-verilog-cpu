@@ -58,7 +58,10 @@ module control (
         case (function_i)
           FUNC_JR: begin
           end
-          FUNC_ADDU: begin
+          FUNC_MTHI, MTLO: begin
+            // TODO: Should not be needed. Remove when tested.
+          end
+          FUNC_ADDU, FUNC_MFHI, FUNC_MHLO: begin
             if (isStateEXEC2) begin
               regfile_write_en_o = 1;
               regfile_writedata_sel_o = 1;
