@@ -26,10 +26,11 @@ module mips_cpu_bus (
 
   // FSM
   logic stall, halt;
-  state_t  state;
+  state_t state;
 
   // Control
-  func_t   funct;
+  full_op_t full_op;
+  func_t funct;
   opcode_t opcode;
   regimm_t regimm;
   logic
@@ -47,6 +48,7 @@ module mips_cpu_bus (
 
   // IR
   regaddr_t rs, rt, rd;
+  logic [25:0] target;  // J, JAL target address
   logic [15:0] immediate;
   logic [4:0] shift;
 
@@ -102,7 +104,7 @@ module mips_cpu_bus (
   // TODO: For JR only. Change if required.
   assign pc_i = rs_regfile_data;
   // TODO: Add proper control logic for when branch conditions are met.
-  assign b_cond_met = ((opcode == OP_SPECIAL) && (funct == FUNC_JR)) ? 1 : 0;
+  //assign b_cond_met = ((opcode == OP_SPECIAL) && (funct == FUNC_JR)) ? 1 : 0;
 
   pc pc (
       .clk(clk),
@@ -119,6 +121,7 @@ module mips_cpu_bus (
       .wen_i(ir_write_en),
       .reset_i(reset),
       .instr_i(readdata_bigendian),
+      .full_op_o(full_op),
       .opcode_o(opcode),
       .funct_o(funct),
       .regimm_o(regimm),
@@ -126,7 +129,8 @@ module mips_cpu_bus (
       .rs_o(rs),
       .rt_o(rt),
       .rd_o(rd),
-      .immediate_o(immediate)
+      .immediate_o(immediate),
+      .target_o(target)
   );
 
   always_comb begin
@@ -172,14 +176,18 @@ module mips_cpu_bus (
 
   alu alu (
       .clk(clk),
+      .full_op_i(full_op),
       .opcode_i(opcode),
       .funct_i(funct),
       .rs_i(rs_regfile_data),
       .rt_i(rt_regfile_data),
       .immediate_i(immediate),
+      .target_i(target),
+      .pc_i(pc_o),
       .rd_o(rd_data_d),
       .rt_o(rt_data_d),
       .effective_address_o(effective_address),
+      .b_cond_met_o(b_cond_met),
       .mfhi_o(mfhi),
       .mflo_o(mflo)
   );
