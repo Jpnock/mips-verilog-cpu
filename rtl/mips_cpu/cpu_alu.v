@@ -14,7 +14,6 @@ module alu (
     output size_t rt_o,
     output size_t effective_address_o,
 
-
     output size_t mfhi_o,
     output size_t mflo_o
 );

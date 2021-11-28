@@ -49,7 +49,7 @@ module control (
         ram_addr_sel_o |= isStateEXEC1;
         regfile_write_en_o |= isStateEXEC2;
       end
-      OP_ADDIU, OP_ANDI, OP_ORI, OP_SLTI, OPSLTIU, OP_XORI: begin
+      OP_ADDIU, OP_ANDI, OP_ORI, OP_SLTI, OP_SLTIU, OP_XORI: begin
         regfile_write_en_o |= isStateEXEC2;
         src_b_sel_o |= isStateEXEC2;
         regfile_writedata_sel_o |= isStateEXEC2;
@@ -58,10 +58,13 @@ module control (
         case (function_i)
           FUNC_JR: begin
           end
-          FUNC_MTHI, MTLO: begin
+          FUNC_MTHI, FUNC_MTLO: begin
             // TODO: Should not be needed. Remove when tested.
           end
-          FUNC_ADDU, FUNC_MFHI, FUNC_MHLO: begin
+          FUNC_ADDU, FUNC_SUBU,
+          FUNC_AND, FUNC_OR, FUNC_XOR,
+          FUNC_SLL, FUNC_SLLV, FUNC_SLTU, FUNC_SRA, FUNC_SRAV, FUNC_SRL, FUNC_SRLV, 
+          FUNC_MFHI, FUNC_MFLO: begin
             if (isStateEXEC2) begin
               regfile_write_en_o = 1;
               regfile_writedata_sel_o = 1;
