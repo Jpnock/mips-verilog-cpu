@@ -56,14 +56,10 @@ module mips_cpu_bus (
 
 
   // ALU
-  logic stall_alu;
   size_t mfhi, mflo, alu_out, effective_address;
 
-
-  /* Modules */
-
   //TODO: Add wait request stalls later.
-  assign stall = stall_alu;
+  assign stall = 0;
   assign halt  = (pc_o == 0) ? 1 : 0;
   fsm fsm (
       .clk(clk),
@@ -161,8 +157,7 @@ module mips_cpu_bus (
       .rt_o(rt_data_d),
       .effective_address_o(effective_address),
       .mfhi_o(mfhi),
-      .mflo_o(mflo),
-      .stall_o(stall_alu)
+      .mflo_o(mflo)
   );
   // TODO: Add support for MFHI/MFLO later.
   // TODO: Remove when ALU has a single output.
