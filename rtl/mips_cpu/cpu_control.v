@@ -8,9 +8,9 @@ module control (
     output logic ir_write_en_o,
     output logic ram_write_en_o,
     output logic ram_read_en_o,
-    output logic src_b_sel_o,
+    output logic [3:0] ram_byte_en_o,
     output logic ram_addr_sel_o,
-    output logic regfile_writedata_sel_o,
+    output logic src_b_sel_o,
     output logic regfile_write_en_o,
     output regfile_addr_sel_t regfile_addr_3_sel_o
 );
@@ -31,28 +31,33 @@ module control (
     ir_write_en_o = isStateEXEC1;
     ram_write_en_o = 0;
     ram_read_en_o = isStateFETCH;
-    src_b_sel_o = 0;
+    ram_byte_en_o = (state_i == FETCH) ? 4'b1111 : 0;
     ram_addr_sel_o = 0;
-    regfile_writedata_sel_o = 0;
+    src_b_sel_o = 0;
     regfile_write_en_o = 0;
     regfile_addr_3_sel_o = REGFILE_ADDR_SEL_RT;
 
     case (opcode_i)
-      OP_SW: begin
-        ram_write_en_o |= isStateEXEC2;
-        src_b_sel_o |= isStateEXEC2;
-        ram_addr_sel_o |= isStateEXEC2;
+      OP_SW, OP_SH, OP_SB: begin
+        if (isStateEXEC2) begin
+          ram_write_en_o = 1;
+          src_b_sel_o = 1;
+          ram_addr_sel_o = 1;
+          ram_byte_en_o = (opcode_i == OP_SW) ? 4'b1111 : (opcode_i == OP_SH ? 4'b1100 : 4'b1000);
+        end
       end
-      OP_LW: begin
-        ram_read_en_o |= isStateEXEC1;
-        src_b_sel_o |= isStateEXEC1;
-        ram_addr_sel_o |= isStateEXEC1;
+      OP_LW, OP_LH, OP_LB: begin
+        if (isStateEXEC1) begin
+          ram_read_en_o = 1;
+          src_b_sel_o = 1;
+          ram_addr_sel_o = 1;
+          ram_byte_en_o = (opcode_i == OP_LW) ? 4'b1111 : (opcode_i == OP_LH ? 4'b1100 : 4'b1000);
+        end
         regfile_write_en_o |= isStateEXEC2;
       end
-      OP_ADDIU, OP_ANDI, OP_ORI, OP_SLTI, OP_SLTIU, OP_XORI: begin
+      OP_ADDIU, OP_ANDI, OP_ORI, OP_SLTI, OP_SLTIU, OP_XORI, OP_LUI: begin
         regfile_write_en_o |= isStateEXEC2;
         src_b_sel_o |= isStateEXEC2;
-        regfile_writedata_sel_o |= isStateEXEC2;
       end
       OP_SPECIAL: begin
         case (function_i)
@@ -66,8 +71,7 @@ module control (
           FUNC_SLL, FUNC_SLLV, FUNC_SLTU, FUNC_SRA, FUNC_SRAV, FUNC_SRL, FUNC_SRLV, 
           FUNC_MFHI, FUNC_MFLO: begin
             if (isStateEXEC2) begin
-              regfile_write_en_o = 1;
-              regfile_writedata_sel_o = 1;
+              regfile_write_en_o   = 1;
               regfile_addr_3_sel_o = REGFILE_ADDR_SEL_RD;
             end
           end
