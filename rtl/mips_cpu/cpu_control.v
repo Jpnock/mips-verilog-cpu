@@ -4,84 +4,71 @@ module control (
     input state_t state_i,
     input opcode_t opcode_i,
     input func_t function_i,
-    output logic pc_wen_o,
-    output logic ir_wen_o,
-    output logic ram_wen_o,
-    output logic ram_rds_o,
-    output logic reg_wen_o,
+    output logic pc_write_en_o,
+    output logic ir_write_en_o,
+    output logic ram_write_en_o,
+    output logic ram_read_en_o,
     output logic src_b_sel_o,
-    output logic ram_a_sel_o,
-    output logic reg_wd_sel_o,
-    output logic reg_a3_sel_o
+    output logic ram_addr_sel_o,
+    output logic regfile_writedata_sel_o,
+    output logic regfile_write_en_o,
+    output regfile_addr_sel_t regfile_addr_3_sel_o
 );
 
   // TODO: Add logic for more instructions.
 
+  logic isStateFETCH;
+  logic isStateEXEC1;
+  logic isStateEXEC2;
+
+  assign isStateFETCH = (state_i == FETCH);
+  assign isStateEXEC1 = (state_i == EXEC1);
+  assign isStateEXEC2 = (state_i == EXEC2);
+
   always_comb begin
-    pc_wen_o = (state_i == EXEC2) ? 1 : 0;
-    ir_wen_o = (state_i == EXEC1) ? 1 : 0;
+    // Defaults
+    pc_write_en_o = isStateEXEC2;
+    ir_write_en_o = isStateEXEC1;
+    ram_write_en_o = 0;
+    ram_read_en_o = isStateFETCH;
+    src_b_sel_o = 0;
+    ram_addr_sel_o = 0;
+    regfile_writedata_sel_o = 0;
+    regfile_write_en_o = 0;
+    regfile_addr_3_sel_o = REGFILE_ADDR_SEL_RT;
+
     case (opcode_i)
       OP_SW: begin
-        ram_wen_o = (state_i == EXEC2) ? 1 : 0;
-        ram_rds_o = (state_i == FETCH) ? 1 : 0;
-        reg_wen_o = 0;
-        src_b_sel_o = (state_i == EXEC2) ? 1 : 0;
-        ram_a_sel_o = (state_i == EXEC2) ? 1 : 0;
-        reg_wd_sel_o = 1'bx;
-        reg_a3_sel_o = 1'bx;
+        ram_write_en_o |= isStateEXEC2;
+        src_b_sel_o |= isStateEXEC2;
+        ram_addr_sel_o |= isStateEXEC2;
       end
       OP_LW: begin
-        ram_wen_o = 0;
-        ram_rds_o = ((state_i == FETCH) || (state_i == EXEC1)) ? 1 : 0;
-        reg_wen_o = (state_i == EXEC2) ? 1 : 0;
-        src_b_sel_o = (state_i == EXEC1) ? 1 : 0;
-        ram_a_sel_o = (state_i == EXEC1) ? 1 : 0;
-        reg_wd_sel_o = 0;
-        reg_a3_sel_o = 0;
+        ram_read_en_o |= isStateEXEC1;
+        src_b_sel_o |= isStateEXEC1;
+        ram_addr_sel_o |= isStateEXEC1;
+        regfile_write_en_o |= isStateEXEC2;
       end
       OP_ADDIU: begin
-        ram_wen_o = 0;
-        ram_rds_o = (state_i == FETCH) ? 1 : 0;
-        reg_wen_o = (state_i == EXEC2) ? 1 : 0;
-        src_b_sel_o = (state_i == EXEC2) ? 1 : 0;
-        ram_a_sel_o = 0;
-        reg_wd_sel_o = (state_i == EXEC2) ? 1 : 0;
-        reg_a3_sel_o = 0;
+        regfile_write_en_o |= isStateEXEC2;
+        src_b_sel_o |= isStateEXEC2;
+        regfile_writedata_sel_o |= isStateEXEC2;
       end
       OP_SPECIAL: begin
         case (function_i)
           FUNC_JR: begin
-            ram_wen_o = 0;
-            ram_rds_o = (state_i == FETCH) ? 1 : 0;
-            reg_wen_o = 0;
-            src_b_sel_o = 0;
-            ram_a_sel_o = 0;
-            reg_wd_sel_o = 0;
-            reg_a3_sel_o = 0;
           end
           FUNC_ADDU: begin
-            ram_wen_o = 0;
-            ram_rds_o = (state_i == FETCH) ? 1 : 0;
-            reg_wen_o = (state_i == EXEC2) ? 1 : 0;
-            src_b_sel_o = 0;
-            ram_a_sel_o = 0;
-            reg_wd_sel_o = (state_i == EXEC2) ? 1 : 0;
-            reg_a3_sel_o = (state_i == EXEC2) ? 1 : 0;
+            if (isStateEXEC2) begin
+              regfile_write_en_o = 1;
+              regfile_writedata_sel_o = 1;
+              regfile_addr_3_sel_o = REGFILE_ADDR_SEL_RD;
+            end
           end
           default: begin
             //$fatal(0, "Instruction undefined.");
           end
         endcase
-      end
-      default: begin
-        ram_wen_o = 0;
-        ram_rds_o = 0;
-        reg_wen_o = 0;
-        src_b_sel_o = 0;
-        ram_a_sel_o = 0;
-        reg_wd_sel_o = 0;
-        reg_a3_sel_o = 0;
-        //$fatal(0, "Instruction undefined.");
       end
     endcase
   end

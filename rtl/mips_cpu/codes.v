@@ -115,4 +115,9 @@ package codes;
     REGIMM_BGEZAL = 5'b10001
   } regimm_t;
 
+  typedef enum logic {
+    REGFILE_ADDR_SEL_RT = 1'b0,
+    REGFILE_ADDR_SEL_RD = 1'b1
+  } regfile_addr_sel_t;
+
 endpackage

@@ -89,7 +89,7 @@ module ir (
   endfunction
 
 `ifdef DEBUG
-  function automatic logic opcode_display(opcode_t i);
+  task automatic opcode_display(input opcode_t i);
     case (i)
       OP_SPECIAL: $display("Got opcode OP_SPECIAL");
       OP_REGIMM:  $display("Got opcode OP_REGIMM");
@@ -121,7 +121,7 @@ module ir (
       OP_SWR:     $display("Got opcode OP_SWR");
       default:    $display("Got opcode OP_INVALID");
     endcase
-  endfunction
+  endtask
 `endif
 
   function automatic func_t logic_to_func(logic [5:0] i);
@@ -159,7 +159,7 @@ module ir (
   endfunction
 
 `ifdef DEBUG
-  function automatic logic func_display(func_t i);
+  task automatic func_display(input func_t i);
     case (i)
       FUNC_SLL:     $display("Got SPECIAL: FUNC_SLL");
       FUNC_SRL:     $display("Got SPECIAL: FUNC_SRL");
@@ -191,7 +191,7 @@ module ir (
       FUNC_SLTU:    $display("Got SPECIAL: FUNC_SLTU");
       default:      $display("Got SPECIAL: FUNC_INVALID");
     endcase
-  endfunction
+  endtask
 `endif
 
   function automatic regimm_t logic_to_regimm(logic [4:0] i);
@@ -205,7 +205,7 @@ module ir (
   endfunction
 
 `ifdef DEBUG
-  function automatic logic regimm_display(regimm_t i);
+  task automatic regimm_display(input regimm_t i);
     case (i)
       REGIMM_BLTZ:   $display("Got REGIMM: REGIMM_BLTZ");
       REGIMM_BGEZ:   $display("Got REGIMM: REGIMM_BGEZ");
@@ -213,7 +213,7 @@ module ir (
       REGIMM_BGEZAL: $display("Got REGIMM: REGIMM_BGEZAL");
       default:       $display("Got REGIMM: REGIMM_INALID");
     endcase
-  endfunction
+  endtask
 `endif
 
 endmodule

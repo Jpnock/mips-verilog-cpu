@@ -16,24 +16,21 @@ module alu (
 
 
     output size_t mfhi_o,
-    output size_t mflo_o,
-    output logic  stall_o
+    output size_t mflo_o
 );
 
-  logic [63:0] mf_d;
-  size_t mfhi_d, mfhi_q;
-  size_t mflo_d, mflo_q;
+  logic [63:0] mf_d, mf_q;
 
-  assign mfhi_o = mfhi_q;
-  assign mflo_o = mflo_q;
+  assign mfhi_o = mf_q[63:32];
+  assign mflo_o = mf_q[31:0];
 
-  function size_t signextend16to32(input [15:0] x);
+  function automatic size_t signextend16to32(input [15:0] x);
     begin
       return x[15] == 1 ? {16'hFFFF, x} : {16'b0, x};
     end
   endfunction
 
-  function size_t zeroextend16to32(input [15:0] x);
+  function automatic size_t zeroextend16to32(input [15:0] x);
     begin
       return {16'b0, x};
     end
@@ -52,9 +49,6 @@ module alu (
   // Obtained from the lower 5 bits of rs.
   logic [4:0] variable_shift_amount;
   assign variable_shift_amount = rs_i[4:0];
-
-  // TODO: Remove this when DIV and DIVU are implemented.
-  assign stall_o = 0;
 
   always_comb begin
     case (opcode_i)
@@ -82,21 +76,25 @@ module alu (
           FUNC_NOR:  rd_o = rs_i~|rt_i;
           FUNC_MULT: begin
             mf_d = $signed(rs_i) * $signed(rt_i);
-            mflo_d = mf_d[31:0];
-            mfhi_d = mf_d[63:32];
           end
           FUNC_MULTU: begin
             mf_d = rs_i * rt_i;
-            mflo_d = mf_d[31:0];
-            mfhi_d = mf_d[63:32];
           end
           FUNC_DIV: begin
-            mflo_d = $signed(rs_i) / $signed(rt_i);
-            mfhi_d = $signed(rs_i) % $signed(rt_i);
+            if (rt_i == 0) begin
+              mf_d = 0;
+            end else begin
+              mf_d[31:0]  = $signed(rs_i) / $signed(rt_i);
+              mf_d[63:32] = $signed(rs_i) % $signed(rt_i);
+            end
           end
           FUNC_DIVU: begin
-            mflo_d = $unsigned(rs_i) / $unsigned(rt_i);
-            mfhi_d = $unsigned(rs_i) % $unsigned(rt_i);
+            if (rt_i == 0) begin
+              mf_d = 0;
+            end else begin
+              mf_d[31:0]  = $unsigned(rs_i) / $unsigned(rt_i);
+              mf_d[63:32] = $unsigned(rs_i) % $unsigned(rt_i);
+            end
           end
         endcase
       end
@@ -138,10 +136,11 @@ module alu (
 
   always_ff @(posedge clk) begin
     if (opcode_i == OP_SPECIAL) begin
-      if (funct_i == FUNC_MULT || funct_i == FUNC_MULTU || funct_i == FUNC_DIV || funct_i == FUNC_DIVU) begin
-        mflo_q <= mflo_d;
-        mfhi_q <= mfhi_d;
-      end
+      case (funct_i)
+        FUNC_MULT, FUNC_MULTU, FUNC_DIV, FUNC_DIVU: begin
+          mf_q <= mf_d;
+        end
+      endcase
     end
   end
 
