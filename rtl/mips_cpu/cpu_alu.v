@@ -99,8 +99,6 @@ module alu (
               mf_d[63:32] = $unsigned(rs_i) % $unsigned(rt_i);
             end
           end
-          FUNC_MFLO: rd_o = mf_q[31:0];
-          FUNC_MFHI: rd_o = mf_q[63:32];
           FUNC_MTHI: mf_d[31:0] = rs_i;
           FUNC_MTLO: mf_d[63:32] = rs_i;
         endcase

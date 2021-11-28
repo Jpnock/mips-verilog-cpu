@@ -128,7 +128,7 @@ module mips_cpu_bus (
     case (regfile_addr_3_sel)
       REGFILE_ADDR_SEL_RD: begin
         addr_3  = rd;
-        alu_out = rd_data_d;
+        alu_out = (funct == FUNC_MFHI) ? mfhi : (funct == FUNC_MFLO) ? mflo : rd_data_d;
       end
       REGFILE_ADDR_SEL_RT: begin
         addr_3  = rt;
