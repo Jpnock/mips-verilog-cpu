@@ -13,7 +13,7 @@ module cpu_ram (
 
   // RAM_SIZE is the size of the RAM, offset from the reset vector
   // RAM_FILE is the name of the file which the RAM will be initialised
-  parameter RAM_FILE = "test/ram_test_01.bin";
+  parameter RAM_FILE = "test/mips/all/01_addiu_lw_jr.asm.hex";
   parameter RAM_OFFSET = 32'hBFC00000;
   parameter RAM_BYTES = 1024;
 
