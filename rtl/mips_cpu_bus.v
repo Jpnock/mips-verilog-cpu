@@ -32,14 +32,7 @@ module mips_cpu_bus (
   func_t   funct;
   opcode_t opcode;
   regimm_t regimm;
-  logic
-      pc_write_en,
-      ir_write_en,
-      regfile_write_en,
-      src_b_sel,
-      ram_addr_sel,
-      regfile_writedata_sel,
-      regfile_addr_3_sel;
+  logic pc_write_en, ir_write_en, regfile_write_en, src_b_sel, ram_addr_sel, regfile_addr_3_sel;
 
   // PC
   logic b_cond_met;
@@ -92,10 +85,10 @@ module mips_cpu_bus (
       .ir_write_en_o(ir_write_en),
       .ram_write_en_o(write),
       .ram_read_en_o(read),
-      .regfile_write_en_o(regfile_write_en),
-      .src_b_sel_o(src_b_sel),
+      .ram_byte_en_o(byteenable),
       .ram_addr_sel_o(ram_addr_sel),
-      .regfile_writedata_sel_o(regfile_writedata_sel),
+      .src_b_sel_o(src_b_sel),
+      .regfile_write_en_o(regfile_write_en),
       .regfile_addr_3_sel_o(regfile_addr_3_sel)
   );
 
@@ -191,10 +184,4 @@ module mips_cpu_bus (
   assign address = (ram_addr_sel == 1) ? effective_address : pc_o;
 
   assign writedata = swap_endian(rt_data_d);
-
-  // TODO: Change when LB instructions are implemented. See the detailed
-  // conversation here on how this should be produced:
-  // https://github.com/Jpnock/verilog-cpu/pull/26#issuecomment-979345783
-  assign byteenable = 4'b1111;
-
 endmodule
