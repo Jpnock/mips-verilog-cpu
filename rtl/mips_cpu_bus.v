@@ -155,7 +155,7 @@ module mips_cpu_bus (
   // be represented in readdata_bigendian as 0xFF000000. A LH which returns
   // 0x4142 will be represented in readdata_bigendian as 0x41420000. These
   // values need shifting to the correct location before writing them.
-  assign write_data_3 = (regfile_writedata_sel == 1) ? alu_out : readdata_bigendian;
+  assign write_data_3 = alu_out;
 
   regfile regfile (
       .clk(clk),
@@ -177,6 +177,7 @@ module mips_cpu_bus (
       .rs_i(rs_regfile_data),
       .rt_i(rt_regfile_data),
       .immediate_i(immediate),
+      .ram_readdata_i(readdata_bigendian),
       .rd_o(rd_data_d),
       .rt_o(rt_data_d),
       .effective_address_o(effective_address),

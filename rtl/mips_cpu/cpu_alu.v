@@ -10,6 +10,8 @@ module alu (
     input size_t rt_i,
     input logic [15:0] immediate_i,
 
+    input size_t ram_readdata_i,
+
     output size_t rd_o,
     output size_t rt_o,
     output size_t effective_address_o,
@@ -49,6 +51,8 @@ module alu (
   // Obtained from the lower 5 bits of rs.
   logic [4:0] variable_shift_amount;
   assign variable_shift_amount = rs_i[4:0];
+
+  assign effective_address_o   = sign_extended_imm + rs_i;
 
   always_comb begin
     case (opcode_i)
@@ -118,12 +122,29 @@ module alu (
           rt_o = 0;
         end
       end
-      OP_ANDI: rt_o = rs_i & zero_extended_imm;
-      OP_ORI: rt_o = rs_i | zero_extended_imm;
-      OP_XORI: rt_o = rs_i ^ zero_extended_imm;
+      OP_ANDI:  rt_o = rs_i & zero_extended_imm;
+      OP_ORI:   rt_o = rs_i | zero_extended_imm;
+      OP_XORI:  rt_o = rs_i ^ zero_extended_imm;
       // TODO: LUI mentions something about sign extension but that doesn't make sense in this context.
-      OP_LUI: rt_o = {immediate_i << 16, 16'b0};
-      OP_LW, OP_SW: effective_address_o = sign_extended_imm + rs_i;
+      OP_LUI:   rt_o = {immediate_i << 16, 16'b0};
+      OP_LW: begin
+        rt_o = ram_readdata_i;
+      end
+      OP_LH: begin
+        rt_o = ram_readdata_i >> 16;
+      end
+      OP_LB: begin
+        rt_o = ram_readdata_i >> 24;
+      end
+      OP_SW: begin
+        rt_o = rt_i;
+      end
+      OP_SH: begin
+        rt_o = rt_i << 16;
+      end
+      OP_SB: begin
+        rt_o = rt_i << 24;
+      end
       // TODO: we need to be careful here if we're doing non 32-bit store
       // operations (e.g. SH, SB). The representation of bytes or half-words
       // will always be presented from bit 32, downward. For example an SB which
