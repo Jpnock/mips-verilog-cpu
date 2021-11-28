@@ -13,7 +13,7 @@ module cpu_ram (
 
   // RAM_SIZE is the size of the RAM, offset from the reset vector
   // RAM_FILE is the name of the file which the RAM will be initialised
-  parameter RAM_FILE = "test/ram_test_01.bin";
+  parameter RAM_FILE = "test/mips/all/01_addiu_lw_jr.asm.hex";
   parameter RAM_OFFSET = 32'hBFC00000;
   parameter RAM_BYTES = 1024;
 
@@ -53,10 +53,10 @@ module cpu_ram (
       ram[mapped_address+2] <= write_2;
       ram[mapped_address+3] <= write_3;
     end
+    readdata <= {read_3, read_2, read_1, read_0};
   end
 
   // TODO: we're ignoring the Avalon timing spec here
-  assign readdata = {read_3, read_2, read_1, read_0};
   assign waitrequest = 0;
 
 endmodule

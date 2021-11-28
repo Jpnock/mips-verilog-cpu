@@ -1,11 +1,11 @@
 SHELL := bash -euo pipefail
 
-.PHONY: all clean build test run
+.PHONY: all clean build build-tests test run
 
 M := $(shell printf "\033[34;1m▶\033[0m")
-BUILD_CMD := iverilog -DDEBUG -Wall -g 2012 rtl/**/*.v rtl/*.v
+BUILD_CMD := iverilog -pfileline=1 -DDEBUG -Wall -g 2012 rtl/**/*.v rtl/*.v
 
-all: clean build test
+all: clean build build-tests test
 
 clean:
 	@rm -f bin/*
@@ -15,6 +15,11 @@ build:
 	@mkdir -p bin
 	@$(BUILD_CMD) -o bin/mips_cpu.out 2>&1 | sed 's/^/  /'
 	@printf "\033[34;1m ...\033[0m built\n"
+
+build-tests:
+	@printf "\033[34;1m▶\033[0m Assembling tests\n"
+	@(cd test; ./build_verilog_testbench.sh)
+	@printf "\033[34;1m ...\033[0m assembled\n"
 
 TESTFILES := $(wildcard rtl/**/*_tb.v) $(wildcard rtl/*_tb.v)
 test:
