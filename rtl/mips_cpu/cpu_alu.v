@@ -126,7 +126,7 @@ module alu (
       OP_ORI:   rt_o = rs_i | zero_extended_imm;
       OP_XORI:  rt_o = rs_i ^ zero_extended_imm;
       // TODO: LUI mentions something about sign extension but that doesn't make sense in this context.
-      OP_LUI:   rt_o = {immediate_i << 16, 16'b0};
+      OP_LUI:   rt_o = {immediate_i, 16'b0};
       OP_LW: begin
         rt_o = ram_readdata_i;
       end
