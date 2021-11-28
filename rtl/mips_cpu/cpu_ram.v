@@ -53,10 +53,10 @@ module cpu_ram (
       ram[mapped_address+2] <= write_2;
       ram[mapped_address+3] <= write_3;
     end
+    readdata <= {read_3, read_2, read_1, read_0};
   end
 
   // TODO: we're ignoring the Avalon timing spec here
-  assign readdata = {read_3, read_2, read_1, read_0};
   assign waitrequest = 0;
 
 endmodule
