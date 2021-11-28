@@ -115,6 +115,11 @@ package codes;
     REGIMM_BGEZAL = 5'b10001
   } regimm_t;
 
+  // TODO: Determine how we want to decode opcodes.
+  // The advantage of having the opcode as a single enum is that we can easily
+  // group the instructions by functionality. This reduces the complexity of the
+  // switch statements quite a bit. The downside of this is that it is
+  // less clear when rs, rt etc. should be used. 
   typedef enum logic [31:0] {
     FOP_INVALID = 32'b1,
 

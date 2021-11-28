@@ -14,8 +14,6 @@ module alu (
 
     input size_t pc_i,
 
-    input logic [7:0] text,
-
     input size_t ram_readdata_i,
 
     output size_t rd_o,
@@ -109,22 +107,6 @@ module alu (
         endcase
       end
 
-      /*
-      OP_REGIMM: begin
-        REGIMM_BLTZ : begin
-          // The offset needs to be relative to the branch delay slot 
-          effective_address_o = (sign_extended_imm << 2) + pc + 4;
-          if (rs_i < 0) begin
-          end
-
-
-        end
-        //REGIMM_BGEZ:
-        //REGIMM_BLTZAL:
-        //REGIMM_BGEZAL:
-      end
-      */
-
       OP_ADDI: begin
         // TODO: fire exception on overflow
         rt_o = rs_i + sign_extended_imm;
@@ -177,37 +159,48 @@ module alu (
       // however they may be handled elsewhere.
     endcase
 
-    // The advantage of having the opcode as a single enum is that we can easily
-    // group the instructions by functionality. The downside of this is that it is
-    // less clear when rs, rt etc. should be used. 
+
 
     // BGEZAL and BLTZAL must not use GBR[31]/$ra as the register to test the
     // jump condition from. This seems to be a compiler restriction, though. 
 
+    // branch condition
+    casex (full_op_i)
+      FOP_BEQ: b_cond_met_o = (rs == rt) ? 1'b1 : 1'b0;
+      FOP_BGEZ: b_cond_met_o = (rs >= 0) ? 1'b1 : 1'b0;
+      FOP_BGTZ: b_cond_met_o = (rs > 0) ? 1'b1 : 1'b0;
+      FOP_BLEZ: b_cond_met_o = (rs <= 0) ? 1'b1 : 1'b0;
+      FOP_BLTZ: b_cond_met_o = (rs < 0) ? 1'b1 : 1'b0;
+      FOP_BNE: b_cond_met_o = (rs != rt) ? 1'b1 : 1'b0;
+      FOP_BGEZAL: b_cond_met_o = (rs >= 0) ? 1'b1 : 1'b0;
+      FOP_BLTZAL: b_cond_met_o = (rs < 0) ? 1'b1 : 1'b0;
+      FOP_J, FOP_JAL, FOP_JR, FOP_JR: b_cond_met_o = 1'b1;
+      default: b_cond_met_o = 1'b0;
+    endcase
+
+    // saving return address. happens regardless if branch condition is met
+    // TODO: The control logic for writing to the register file needs to be handled.
+    casex (full_op_i)
+      //GPR[31] = PC + 8
+      FOP_BGEZAL, FOP_BLTZAL, FOP_JAL: rt = pc_i + 8;
+
+      // this one should be GPR[rd] = PC + 8 
+      FOP_JALR: rt = pc_i + 8;
+    endcase
 
     // Determine branch address
-    case (full_op_i)
+    casex (full_op_i)
+      // branch is relative to branch delay slot
+      FOP_BEQ, FOP_BGEZ, FOP_BGTZ, FOP_BLEZ, FOP_BLTZ, FOP_BNE, FOP_BGEZAL, FOP_BLTZAL:
+      effective_address_o = (sign_extended_imm << 2) + pc_i + 4;
 
-      FOP_BEQ, FOP_BGEZ, FOP_BGTZ, FOP_BLEZ, FOP_BLTZ, FOP_BNE, FOP_BGEZAL, FOP_BLTZAL: begin
-        // branch is relative to branch delay slot
-        effective_address_o = (sign_extended_imm << 2) + pc_i + 4;
-      end
+      // PC region jumps
+      FOP_J, FOP_JAL: effective_address_o = {pc_in[31:26], target};
 
-      FOP_J, FOP_JAL: begin
-        // PC region jumps
-        effective_address_o = {pc_in[31:26], target};
-      end
+      // register jumps
+      JALR, JR: effective_address_o = rs;
 
-      JALR, JR: begin
-        // register jumps
-        effective_address_o = rs;
-      end
-
-      default: begin
-        b_cond_met_o = 1'b0;
-        effective_address_o = 32'b0;
-      end
-
+      default: effective_address_o = 32'b0;
     endcase
 
   end

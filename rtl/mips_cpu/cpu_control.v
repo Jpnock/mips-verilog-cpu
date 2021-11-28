@@ -75,5 +75,6 @@ module control (
         endcase
       end
     endcase
+
   end
 endmodule
