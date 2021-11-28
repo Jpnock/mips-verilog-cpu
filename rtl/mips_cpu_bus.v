@@ -32,7 +32,14 @@ module mips_cpu_bus (
   func_t   funct;
   opcode_t opcode;
   regimm_t regimm;
-  logic pc_wen, ir_wen, reg_wen, src_b_sel, ram_a_sel, reg_wd_sel, reg_a3_sel;
+  logic
+      pc_write_en,
+      ir_write_en,
+      regfile_write_en,
+      src_b_sel,
+      ram_addr_sel,
+      regfile_writedata_sel,
+      regfile_addr_3_sel;
 
   // PC
   logic b_cond_met;
@@ -81,15 +88,15 @@ module mips_cpu_bus (
       .state_i(state),
       .opcode_i(opcode),
       .function_i(funct),
-      .pc_wen_o(pc_wen),
-      .ir_wen_o(ir_wen),
-      .ram_wen_o(write),
-      .ram_rds_o(read),
-      .reg_wen_o(reg_wen),
+      .pc_write_en_o(pc_write_en),
+      .ir_write_en_o(ir_write_en),
+      .ram_write_en_o(write),
+      .ram_read_en_o(read),
+      .regfile_write_en_o(regfile_write_en),
       .src_b_sel_o(src_b_sel),
-      .ram_a_sel_o(ram_a_sel),
-      .reg_wd_sel_o(reg_wd_sel),
-      .reg_a3_sel_o(reg_a3_sel)
+      .ram_addr_sel_o(ram_addr_sel),
+      .regfile_writedata_sel_o(regfile_writedata_sel),
+      .regfile_addr_3_sel_o(regfile_addr_3_sel)
   );
 
   // TODO: For JR only. Change if required.
@@ -100,17 +107,16 @@ module mips_cpu_bus (
   pc pc (
       .clk(clk),
       .reset(reset),
-      .wen(pc_wen),
+      .wen(pc_write_en),
       .b_cond_met(b_cond_met),
       .pc_i(pc_i),
       .pc_o(pc_o)
   );
 
-
   ir ir (
       .clk(clk),
       .state_i(state),
-      .wen_i(ir_wen),
+      .wen_i(ir_write_en),
       .reset_i(reset),
       .instr_i(readdata_bigendian),
       .opcode_o(opcode),
@@ -123,7 +129,25 @@ module mips_cpu_bus (
       .immediate_o(immediate)
   );
 
-  assign addr_3 = (reg_a3_sel == 1) ? rd : rt;
+  always_comb begin
+    // TODO: Add support for MFHI/MFLO later.
+    // TODO: Remove alu_out multiplexer when the ALU has a single output.
+    case (regfile_addr_3_sel)
+      REGFILE_ADDR_SEL_RD: begin
+        addr_3  = rd;
+        alu_out = rd_data_d;
+      end
+      REGFILE_ADDR_SEL_RT: begin
+        addr_3  = rt;
+        alu_out = rt_data_d;
+      end
+      default: begin
+`ifdef DEBUG
+        $fatal(1, "unknown enum value for regfile_addr_3_sel");
+`endif
+      end
+    endcase
+  end
 
   // TODO: we need to be careful here if we're doing non 32-bit load operations
   // (e.g. LH, LB). The representation of bytes or half-words will always be
@@ -131,7 +155,7 @@ module mips_cpu_bus (
   // be represented in readdata_bigendian as 0xFF000000. A LH which returns
   // 0x4142 will be represented in readdata_bigendian as 0x41420000. These
   // values need shifting to the correct location before writing them.
-  assign write_data_3 = (reg_wd_sel == 1) ? alu_out : readdata_bigendian;
+  assign write_data_3 = (regfile_writedata_sel == 1) ? alu_out : readdata_bigendian;
 
   regfile regfile (
       .clk(clk),
@@ -140,7 +164,7 @@ module mips_cpu_bus (
       .addr_2_i(rt),
       .addr_3_i(addr_3),
       .write_data_3_i(write_data_3),
-      .write_enable_i(reg_wen),
+      .write_enable_i(regfile_write_en),
       .read_data_1_o(rs_regfile_data),
       .read_data_2_o(rt_regfile_data),
       .read_data_reg_v0_o(read_data_reg_v0)
@@ -159,14 +183,11 @@ module mips_cpu_bus (
       .mfhi_o(mfhi),
       .mflo_o(mflo)
   );
-  // TODO: Add support for MFHI/MFLO later.
-  // TODO: Remove when ALU has a single output.
-  assign alu_out = (reg_a3_sel == 1) ? rd_data_d : rt_data_d;
 
   /* Other IO/IN. */
   assign active = state != HALT;
   assign register_v0 = read_data_reg_v0;
-  assign address = (ram_a_sel == 1) ? effective_address : pc_o;
+  assign address = (ram_addr_sel == 1) ? effective_address : pc_o;
 
   assign writedata = swap_endian(rt_data_d);
 
