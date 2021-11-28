@@ -68,7 +68,7 @@ module control (
           end
           FUNC_ADDU, FUNC_SUBU,
           FUNC_AND, FUNC_OR, FUNC_XOR,
-          FUNC_SLL, FUNC_SLLV, FUNC_SLTU, FUNC_SRA, FUNC_SRAV, FUNC_SRL, FUNC_SRLV, 
+          FUNC_SLT, FUNC_SLL, FUNC_SLLV, FUNC_SLTU, FUNC_SRA, FUNC_SRAV, FUNC_SRL, FUNC_SRLV, 
           FUNC_MFHI, FUNC_MFLO: begin
             if (isStateEXEC2) begin
               regfile_write_en_o   = 1;
