@@ -56,7 +56,7 @@ module alu (
   logic [4:0] variable_shift_amount;
   assign variable_shift_amount = rs_i[4:0];
 
-  assign effective_address_o   = sign_extended_imm + rs_i;
+  //assign effective_address_o   = sign_extended_imm + rs_i;
 
   always_comb begin
     case (opcode_i)
@@ -132,22 +132,31 @@ module alu (
       OP_XORI:  rt_o = rs_i ^ zero_extended_imm;
       // TODO: LUI mentions something about sign extension but that doesn't make sense in this context.
       OP_LUI:   rt_o = {immediate_i, 16'b0};
+      // TODO: For to fix some build errors I just moved the effective_address assignment here
+      // to each load and store instruction, since the branch instruction also uses it. 
+      // Perhaps they should use different wires?
       OP_LW: begin
+        effective_address_o = sign_extended_imm + rs_i;
         rt_o = ram_readdata_i;
       end
       OP_LH: begin
+        effective_address_o = sign_extended_imm + rs_i;
         rt_o = ram_readdata_i >> 16;
       end
       OP_LB: begin
+        effective_address_o = sign_extended_imm + rs_i;
         rt_o = ram_readdata_i >> 24;
       end
       OP_SW: begin
+        effective_address_o = sign_extended_imm + rs_i;
         rt_o = rt_i;
       end
       OP_SH: begin
+        effective_address_o = sign_extended_imm + rs_i;
         rt_o = rt_i << 16;
       end
       OP_SB: begin
+        effective_address_o = sign_extended_imm + rs_i;
         rt_o = rt_i << 24;
       end
       // TODO: we need to be careful here if we're doing non 32-bit store
@@ -157,6 +166,7 @@ module alu (
       // 0x4142 will be represented as 0x41420000. These values need shifting to
       // the correct location before outputting them. The same applies to loads,
       // however they may be handled elsewhere.
+      default:  ;
     endcase
 
 
@@ -166,14 +176,14 @@ module alu (
 
     // branch condition
     casex (full_op_i)
-      FOP_BEQ: b_cond_met_o = (rs == rt) ? 1'b1 : 1'b0;
-      FOP_BGEZ: b_cond_met_o = (rs >= 0) ? 1'b1 : 1'b0;
-      FOP_BGTZ: b_cond_met_o = (rs > 0) ? 1'b1 : 1'b0;
-      FOP_BLEZ: b_cond_met_o = (rs <= 0) ? 1'b1 : 1'b0;
-      FOP_BLTZ: b_cond_met_o = (rs < 0) ? 1'b1 : 1'b0;
-      FOP_BNE: b_cond_met_o = (rs != rt) ? 1'b1 : 1'b0;
-      FOP_BGEZAL: b_cond_met_o = (rs >= 0) ? 1'b1 : 1'b0;
-      FOP_BLTZAL: b_cond_met_o = (rs < 0) ? 1'b1 : 1'b0;
+      FOP_BEQ: b_cond_met_o = (rs_i == rt_i) ? 1'b1 : 1'b0;
+      FOP_BGEZ: b_cond_met_o = (rs_i >= 0) ? 1'b1 : 1'b0;
+      FOP_BGTZ: b_cond_met_o = (rs_i > 0) ? 1'b1 : 1'b0;
+      FOP_BLEZ: b_cond_met_o = (rs_i <= 0) ? 1'b1 : 1'b0;
+      FOP_BLTZ: b_cond_met_o = (rs_i < 0) ? 1'b1 : 1'b0;
+      FOP_BNE: b_cond_met_o = (rs_i != rt_i) ? 1'b1 : 1'b0;
+      FOP_BGEZAL: b_cond_met_o = (rs_i >= 0) ? 1'b1 : 1'b0;
+      FOP_BLTZAL: b_cond_met_o = (rs_i < 0) ? 1'b1 : 1'b0;
       FOP_J, FOP_JAL, FOP_JR, FOP_JR: b_cond_met_o = 1'b1;
       default: b_cond_met_o = 1'b0;
     endcase
@@ -182,10 +192,10 @@ module alu (
     // TODO: The control logic for writing to the register file needs to be handled.
     casex (full_op_i)
       //GPR[31] = PC + 8
-      FOP_BGEZAL, FOP_BLTZAL, FOP_JAL: rt = pc_i + 8;
+      FOP_BGEZAL, FOP_BLTZAL, FOP_JAL: rt_o = pc_i + 8;
 
       // this one should be GPR[rd] = PC + 8 
-      FOP_JALR: rt = pc_i + 8;
+      FOP_JALR: rt_o = pc_i + 8;
     endcase
 
     // Determine branch address
@@ -195,10 +205,10 @@ module alu (
       effective_address_o = (sign_extended_imm << 2) + pc_i + 4;
 
       // PC region jumps
-      FOP_J, FOP_JAL: effective_address_o = {pc_in[31:26], target};
+      FOP_J, FOP_JAL: effective_address_o = {pc_i[31:26], target_i};
 
       // register jumps
-      JALR, JR: effective_address_o = rs;
+      FOP_JALR, FOP_JR: effective_address_o = rs_i;
 
       default: effective_address_o = 32'b0;
     endcase
