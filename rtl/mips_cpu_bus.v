@@ -133,6 +133,9 @@ module mips_cpu_bus (
       REGFILE_ADDR_SEL_RD: begin
         addr_3  = rd;
         alu_out = rd_data_d;
+        if (opcode == OP_SPECIAL) begin
+          alu_out = (funct == FUNC_MFHI) ? mfhi : (funct == FUNC_MFLO) ? mflo : rd_data_d;
+        end
       end
       REGFILE_ADDR_SEL_RT: begin
         addr_3  = rt;
@@ -170,6 +173,7 @@ module mips_cpu_bus (
   alu alu (
       .clk(clk),
       .full_op_i(full_op),
+      .reset_i(reset),
       .opcode_i(opcode),
       .funct_i(funct),
       .rs_i(rs_regfile_data),
