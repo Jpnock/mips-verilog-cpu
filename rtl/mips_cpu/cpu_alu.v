@@ -7,6 +7,7 @@ module alu (
     input full_op_t full_op_i,
     input opcode_t opcode_i,
     input func_t funct_i,
+    input regimm_t regimm_i,
 
     input size_t rs_i,
     input size_t rt_i,
@@ -190,40 +191,70 @@ module alu (
     // jump condition from. This seems to be a compiler restriction, though. 
 
     // branch condition
-    casex (full_op_i)
-      FOP_BEQ: b_cond_met_o = (rs_i == rt_i) ? 1'b1 : 1'b0;
-      FOP_BGEZ: b_cond_met_o = (rs_i >= 0) ? 1'b1 : 1'b0;
-      FOP_BGTZ: b_cond_met_o = (rs_i > 0) ? 1'b1 : 1'b0;
-      FOP_BLEZ: b_cond_met_o = (rs_i <= 0) ? 1'b1 : 1'b0;
-      FOP_BLTZ: b_cond_met_o = (rs_i < 0) ? 1'b1 : 1'b0;
-      FOP_BNE: b_cond_met_o = (rs_i != rt_i) ? 1'b1 : 1'b0;
-      FOP_BGEZAL: b_cond_met_o = (rs_i >= 0) ? 1'b1 : 1'b0;
-      FOP_BLTZAL: b_cond_met_o = (rs_i < 0) ? 1'b1 : 1'b0;
-      FOP_J, FOP_JAL, FOP_JR, FOP_JR: b_cond_met_o = 1'b1;
+    case (opcode_i)
+      OP_BEQ:  b_cond_met_o = (rs_i == rt_i) ? 1'b1 : 1'b0;
+      OP_BGTZ: b_cond_met_o = (rs_i > 0) ? 1'b1 : 1'b0;
+      OP_BLEZ: b_cond_met_o = (rs_i <= 0) ? 1'b1 : 1'b0;
+      OP_BNE:  b_cond_met_o = (rs_i != rt_i) ? 1'b1 : 1'b0;
+
+      OP_J, OP_JAL: b_cond_met_o = 1'b1;
+
+      OP_SPECIAL: begin
+        case (funct_i)
+          FUNC_JR, FUNC_JALR: b_cond_met_o = 1'b1;
+          default: b_cond_met_o = 1'b0;
+        endcase
+      end
+
+      OP_REGIMM: begin
+        case (regimm_i)
+          REGIMM_BLTZ: b_cond_met_o = (rs_i < 0) ? 1'b1 : 1'b0;
+          REGIMM_BGEZ: b_cond_met_o = (rs_i >= 0) ? 1'b1 : 1'b0;
+          REGIMM_BLTZAL: b_cond_met_o = (rs_i < 0) ? 1'b1 : 1'b0;
+          REGIMM_BGEZAL: b_cond_met_o = (rs_i >= 0) ? 1'b1 : 1'b0;
+          default: b_cond_met_o = 1'b0;
+        endcase
+      end
+
       default: b_cond_met_o = 1'b0;
     endcase
 
+
+
     // saving return address. happens regardless if branch condition is met
     // TODO: The control logic for writing to the register file needs to be handled.
-    casex (full_op_i)
+    case (opcode_i)
       //GPR[31] = PC + 8
-      FOP_BGEZAL, FOP_BLTZAL, FOP_JAL: rt_o = pc_i + 8;
+      OP_REGIMM: if (regimm_i == REGIMM_BGEZAL || regimm_i == REGIMM_BLTZAL) rt_o = pc_i + 8;
+      OP_JAL: rt_o = pc_i + 8;
 
-      // this one should be GPR[rd] = PC + 8 
-      FOP_JALR: rt_o = pc_i + 8;
+      // this one should be GPR[rd] = PC + 8
+      OP_SPECIAL: if (funct_i == FUNC_JALR) rt_o = pc_i + 8;
     endcase
 
     // Determine branch address
-    casex (full_op_i)
+    case (opcode_i)
+
       // branch is relative to branch delay slot
-      FOP_BEQ, FOP_BGEZ, FOP_BGTZ, FOP_BLEZ, FOP_BLTZ, FOP_BNE, FOP_BGEZAL, FOP_BLTZAL:
-      effective_address_o = (sign_extended_imm << 2) + pc_i + 4;
+      OP_BEQ, OP_BGTZ, OP_BLEZ, OP_BNE: effective_address_o = (sign_extended_imm << 2) + pc_i + 4;
+
+      OP_REGIMM: begin
+        case (regimm_i)
+          REGIMM_BLTZ, REGIMM_BGEZ, REGIMM_BLTZAL, REGIMM_BGEZAL:
+          effective_address_o = (sign_extended_imm << 2) + pc_i + 4;
+          default: effective_address_o = 32'b0;
+        endcase
+      end
 
       // PC region jumps
-      FOP_J, FOP_JAL: effective_address_o = {pc_i[31:26], target_i};
+      OP_J, OP_JAL: effective_address_o = {pc_i[31:26], target_i};
 
       // register jumps
-      FOP_JALR, FOP_JR: effective_address_o = rs_i;
+      OP_SPECIAL: begin
+        case (funct_i)
+          FUNC_JALR, FUNC_JR: effective_address_o = rs_i;
+        endcase
+      end
 
       default: effective_address_o = 32'b0;
     endcase

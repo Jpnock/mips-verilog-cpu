@@ -176,6 +176,7 @@ module mips_cpu_bus (
       .reset_i(reset),
       .opcode_i(opcode),
       .funct_i(funct),
+      .regimm_i(regimm),
       .rs_i(rs_regfile_data),
       .rt_i(rt_regfile_data),
       .immediate_i(immediate),
