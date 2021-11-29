@@ -61,11 +61,6 @@ module control (
       end
       OP_SPECIAL: begin
         case (function_i)
-          FUNC_JR: begin
-          end
-          FUNC_MTHI, FUNC_MTLO: begin
-            // TODO: Should not be needed. Remove when tested.
-          end
           FUNC_ADDU, FUNC_SUBU,
           FUNC_AND, FUNC_OR, FUNC_XOR,
           FUNC_SLT, FUNC_SLL, FUNC_SLLV, FUNC_SLTU, FUNC_SRA, FUNC_SRAV, FUNC_SRL, FUNC_SRLV, 
