@@ -55,7 +55,7 @@ module control (
         end
         regfile_write_en_o |= isStateEXEC2;
       end
-      OP_ADDIU, OP_ANDI, OP_ORI, OP_SLTI, OP_SLTIU, OP_XORI, OP_LUI: begin
+      OP_ADDI, OP_ADDIU, OP_SLTI, OP_SLTIU, OP_ANDI, OP_ORI,  OP_XORI, OP_LUI: begin
         regfile_write_en_o |= isStateEXEC2;
         src_b_sel_o |= isStateEXEC2;
       end
