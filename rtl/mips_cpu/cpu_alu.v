@@ -2,6 +2,7 @@ import codes::*;
 
 module alu (
     input logic clk,
+    input logic reset_i,
 
     input opcode_t opcode_i,
     input func_t   funct_i,
@@ -99,8 +100,6 @@ module alu (
               mf_d[63:32] = rs_i % rt_i;
             end
           end
-          FUNC_MTHI: mf_d[31:0] = rs_i;
-          FUNC_MTLO: mf_d[63:32] = rs_i;
           FUNC_SLT: begin
             if ($signed(rs_i) < $signed(rt_i)) begin
               rd_o = 1;
@@ -171,11 +170,15 @@ module alu (
   end
 
   always_ff @(posedge clk) begin
-    if (opcode_i == OP_SPECIAL) begin
+    if (reset_i == 1) begin
+      mf_q <= 0;
+    end else if (opcode_i == OP_SPECIAL) begin
       case (funct_i)
         FUNC_MULT, FUNC_MULTU, FUNC_DIV, FUNC_DIVU, FUNC_MTHI, FUNC_MTLO: begin
           mf_q <= mf_d;
         end
+        FUNC_MTHI: mf_q[63:32] <= rs_i;
+        FUNC_MTLO: mf_q[31:0] <= rs_i;
       endcase
     end
   end
