@@ -3,22 +3,44 @@ set -euo pipefail
 l="\033[34;1m"
 ll="\033[0m"
 
-tb_name=${1##*/}
-tb_name=${tb_name%.v}
+TEST_FILES="test/mips/all/*.asm"
 
-out="./bin/${tb_name}.out"
-outlog="./bin/${tb_name}.log"
+for file in $TEST_FILES; do
 
-printf "$l▶$ll building test: ${tb_name}\n" $
+    # Logging/Output Files
+    out="./bin/$(basename $file).out"
+    outlog="./bin/$(basename $file).log"
 
-iverilog -pfileline=1 -DDEBUG -Wall -g 2012 rtl/**/*.v rtl/*.v -s "${tb_name}" -o "$out" 2>&1 | sed 's/^/  /'
+    # Extract Expected Value
+    read -r expected_value <$file
+    expected_value=$(echo $expected_value | sed 's/^.*Expect: //')
 
-printf "$l...$ll built\n"
+    printf "$l▶$ll Building Test: $(basename $file)\n" $
 
-printf "$l▶$ll running test: ${tb_name}\n" $
+    #Build TB
+    iverilog -DDEBUG -Wall -g 2012 rtl/**/*.v rtl/*.v \
+        -s mips_cpu_bus_tb \
+        -P mips_cpu_bus_tb.EXPECTED_VALUE="$expected_value" \
+        -P mips_cpu_bus_tb.RAM_FILE=\"${file}.hex\" \
+        -o "$out" 2>&1 | sed 's/^/  /'
 
-./$out > "${outlog}" 2>&1 || (cat "${outlog}" | sed 's/^/  /'; exit 1)
+    printf "$l...$ll Built!\n"
 
-grep -q -i "error:" "${outlog}" > /dev/null && (cat "${outlog}" | sed 's/^/  /'; printf "$l ...$ll failed %s\n"; exit 1;)
+    printf "$l▶$ll Running Test: $(basename $file)\n" $
 
-printf "$l...$ll passed\n"
+    # Run
+    ./$out >"${outlog}" 2>&1 || (
+        cat "${outlog}" | sed 's/^/  /'
+        exit 1
+    )
+
+    # Error
+    grep -q -i "Error:" "${outlog}" >/dev/null && (
+        cat "${outlog}" | sed 's/^/  /'
+        printf "$l ...$ll failed %s\n"
+        exit 1
+    )
+
+    printf "$l...$ll Passed!\n"
+
+done

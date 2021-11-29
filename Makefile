@@ -21,12 +21,9 @@ build-tests:
 	@(cd test; ./build_verilog_testbench.sh)
 	@printf "\033[34;1m ...\033[0m assembled\n"
 
-TESTFILES := $(wildcard rtl/**/*_tb.v) $(wildcard rtl/*_tb.v)
 test:
 	@mkdir -p bin
-	@for t in $(TESTFILES); do \
-		(./test/run_verilog_testbench.sh "$$t" || exit 1); \
-	done;
+	@./test/run_verilog_testbench.sh || exit 1
 
 run:
 	@printf "\033[34;1m▶\033[0m Running ./bin/mips_cpu.out\n"
