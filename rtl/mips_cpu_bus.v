@@ -83,6 +83,8 @@ module mips_cpu_bus (
       .state_i(state),
       .opcode_i(opcode),
       .function_i(funct),
+      .regimm_i(regimm),
+      .b_cond_met_i(b_cond_met),
       .pc_write_en_o(pc_write_en),
       .ir_write_en_o(ir_write_en),
       .ram_write_en_o(write),

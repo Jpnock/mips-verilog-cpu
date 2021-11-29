@@ -185,10 +185,7 @@ module alu (
       default:  ;
     endcase
 
-
-
-    // BGEZAL and BLTZAL must not use GBR[31]/$ra as the register to test the
-    // jump condition from. This seems to be a compiler restriction, though. 
+    b_cond_met_o = 1'b0;
 
     // branch condition
     case (opcode_i)
@@ -202,47 +199,40 @@ module alu (
       OP_SPECIAL: begin
         case (funct_i)
           FUNC_JR, FUNC_JALR: b_cond_met_o = 1'b1;
-          default: b_cond_met_o = 1'b0;
         endcase
       end
 
+      // BGEZAL and BLTZAL must not use GBR[31]/$ra as the register to test the
+      // jump condition from. This seems to be a compiler restriction, though. 
       OP_REGIMM: begin
         case (regimm_i)
-          REGIMM_BLTZ: b_cond_met_o = (rs_i < 0) ? 1'b1 : 1'b0;
-          REGIMM_BGEZ: b_cond_met_o = (rs_i >= 0) ? 1'b1 : 1'b0;
+          REGIMM_BLTZ:   b_cond_met_o = (rs_i < 0) ? 1'b1 : 1'b0;
+          REGIMM_BGEZ:   b_cond_met_o = (rs_i >= 0) ? 1'b1 : 1'b0;
           REGIMM_BLTZAL: b_cond_met_o = (rs_i < 0) ? 1'b1 : 1'b0;
           REGIMM_BGEZAL: b_cond_met_o = (rs_i >= 0) ? 1'b1 : 1'b0;
-          default: b_cond_met_o = 1'b0;
         endcase
       end
-
-      default: b_cond_met_o = 1'b0;
     endcase
-
-
 
     // saving return address. happens regardless if branch condition is met
     // TODO: The control logic for writing to the register file needs to be handled.
     case (opcode_i)
       //GPR[31] = PC + 8
-      OP_REGIMM: if (regimm_i == REGIMM_BGEZAL || regimm_i == REGIMM_BLTZAL) rt_o = pc_i + 8;
-      OP_JAL: rt_o = pc_i + 8;
+      OP_REGIMM: if (regimm_i == REGIMM_BGEZAL || regimm_i == REGIMM_BLTZAL) rd_o = pc_i + 8;
+      OP_JAL: rd_o = pc_i + 8;
 
       // this one should be GPR[rd] = PC + 8
-      OP_SPECIAL: if (funct_i == FUNC_JALR) rt_o = pc_i + 8;
+      OP_SPECIAL: if (funct_i == FUNC_JALR) rd_o = pc_i + 8;
     endcase
 
     // Determine branch address
     case (opcode_i)
-
       // branch is relative to branch delay slot
       OP_BEQ, OP_BGTZ, OP_BLEZ, OP_BNE: effective_address_o = (sign_extended_imm << 2) + pc_i + 4;
-
       OP_REGIMM: begin
         case (regimm_i)
           REGIMM_BLTZ, REGIMM_BGEZ, REGIMM_BLTZAL, REGIMM_BGEZAL:
           effective_address_o = (sign_extended_imm << 2) + pc_i + 4;
-          default: effective_address_o = 32'b0;
         endcase
       end
 
@@ -255,8 +245,6 @@ module alu (
           FUNC_JALR, FUNC_JR: effective_address_o = rs_i;
         endcase
       end
-
-      default: effective_address_o = 32'b0;
     endcase
 
   end
