@@ -168,6 +168,7 @@ module mips_cpu_bus (
 
   alu alu (
       .clk(clk),
+      .reset_i(reset),
       .opcode_i(opcode),
       .funct_i(funct),
       .rs_i(rs_regfile_data),
