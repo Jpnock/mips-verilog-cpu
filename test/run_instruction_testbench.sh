@@ -23,6 +23,7 @@ for file in $TEST_FILES; do
 
     #Build TB
     iverilog -DDEBUG -Wall -g 2012 ${SOURCE_DIR}/**/*.v ${SOURCE_DIR}/*.v \
+        -pfileline=1 \
         -s mips_cpu_bus_tb \
         -P mips_cpu_bus_tb.EXPECTED_VALUE="$expected_value" \
         -P mips_cpu_bus_tb.RAM_FILE=\"${file}.hex\" \
@@ -30,9 +31,8 @@ for file in $TEST_FILES; do
 
     printf "$l...$ll Built!\n"
 
-    printf "$l▶$ll Running Test: $(basename $file)\n" $
-
     # Run
+    printf "$l▶$ll Running Test: $(basename $file)\n" $
     ./$out >"${outlog}" 2>&1 || (
         cat "${outlog}" | sed 's/^/  /'
         exit 1

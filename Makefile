@@ -18,12 +18,13 @@ build:
 
 build-tests:
 	@printf "\033[34;1m▶\033[0m Assembling tests\n"
-	@(cd test; ./build_verilog_testbench.sh)
+	@(cd test; ./build_instruction_testbench.sh)
 	@printf "\033[34;1m ...\033[0m assembled\n"
 
 test:
 	@mkdir -p bin
-	@./test/run_verilog_testbench.sh rtl all || exit 1
+	@./test/run_submodule_testbench.sh || exit 1
+	@./test/run_instruction_testbench.sh rtl all || exit 1
 
 run:
 	@printf "\033[34;1m▶\033[0m Running ./bin/mips_cpu.out\n"
