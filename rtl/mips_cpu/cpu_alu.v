@@ -99,8 +99,8 @@ module alu (
               mf_d[63:32] = rs_i % rt_i;
             end
           end
-          FUNC_MTHI: mf_d[31:0] = rs_i;
-          FUNC_MTLO: mf_d[63:32] = rs_i;
+          FUNC_MTHI: mf_d[63:32] = rs_i;
+          FUNC_MTLO: mf_d[31:0] = rs_i;
           FUNC_SLT: begin
             if ($signed(rs_i) < $signed(rt_i)) begin
               rd_o = 1;
