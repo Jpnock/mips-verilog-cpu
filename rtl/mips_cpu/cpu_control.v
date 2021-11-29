@@ -87,7 +87,7 @@ module control (
       OP_JAL: begin
         if (isStateEXEC2) begin
           regfile_write_en_o   = b_cond_met_i;
-          regfile_addr_3_sel_o = REGFILE_ADDR_SEL_RD;
+          regfile_addr_3_sel_o = REGFILE_ADDR_SEL_GPR31;
         end
       end
       OP_REGIMM: begin
@@ -95,7 +95,7 @@ module control (
           REGIMM_BGEZAL, REGIMM_BLTZAL: begin
             if (isStateEXEC2) begin
               regfile_write_en_o   = b_cond_met_i;
-              regfile_addr_3_sel_o = REGFILE_ADDR_SEL_RD;
+              regfile_addr_3_sel_o = REGFILE_ADDR_SEL_GPR31;
             end
           end
         endcase
