@@ -33,7 +33,8 @@ module mips_cpu_bus (
   func_t funct;
   opcode_t opcode;
   regimm_t regimm;
-  logic pc_write_en, ir_write_en, regfile_write_en, src_b_sel, ram_addr_sel, regfile_addr_3_sel;
+  logic pc_write_en, ir_write_en, regfile_write_en, src_b_sel, ram_addr_sel;
+  logic [1:0] regfile_addr_3_sel;
 
   // PC
   logic b_cond_met;
@@ -144,7 +145,7 @@ module mips_cpu_bus (
         alu_out = rt_data_d;
       end
       REGFILE_ADDR_SEL_GPR31: begin
-        addr_3  = 5'd32;
+        addr_3  = 5'd31;
         alu_out = rd_data_d;
       end
       default: begin

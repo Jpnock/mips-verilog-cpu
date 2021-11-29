@@ -206,7 +206,7 @@ package codes;
 
 
 
-  typedef enum logic {
+  typedef enum logic [1:0] {
     REGFILE_ADDR_SEL_RT    = 2'b00,
     REGFILE_ADDR_SEL_RD    = 2'b01,
     REGFILE_ADDR_SEL_GPR31 = 2'b10
