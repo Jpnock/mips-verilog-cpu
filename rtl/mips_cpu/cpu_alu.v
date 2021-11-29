@@ -83,7 +83,7 @@ module alu (
           FUNC_AND:  rd_o = rs_i & rt_i;
           FUNC_OR:   rd_o = rs_i | rt_i;
           FUNC_XOR:  rd_o = rs_i ^ rt_i;
-          //FUNC_NOR:  rd_o = rs_i~|rt_i;
+          FUNC_NOR:  rd_o = rs_i~|rt_i;
           FUNC_MULT: begin
             mf_d = $signed(rs_i) * $signed(rt_i);
           end
