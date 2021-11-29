@@ -55,15 +55,16 @@ module control (
         end
         regfile_write_en_o |= isStateEXEC2;
       end
-      OP_ADDIU, OP_LUI: begin
+      OP_ADDI, OP_ADDIU, OP_SLTI, OP_SLTIU, OP_ANDI, OP_ORI,  OP_XORI, OP_LUI: begin
         regfile_write_en_o |= isStateEXEC2;
         src_b_sel_o |= isStateEXEC2;
       end
       OP_SPECIAL: begin
         case (function_i)
-          FUNC_JR: begin
-          end
-          FUNC_ADDU: begin
+          FUNC_SLL, FUNC_SRL, FUNC_SRA, FUNC_SLLV, FUNC_SRLV, FUNC_SRAV, 
+          FUNC_MFHI, FUNC_MFLO,
+          FUNC_ADD, FUNC_ADDU, FUNC_SUB, FUNC_SUBU, FUNC_AND, FUNC_OR, FUNC_XOR, FUNC_NOR,
+          FUNC_SLT, FUNC_SLTU: begin
             if (isStateEXEC2) begin
               regfile_write_en_o   = 1;
               regfile_addr_3_sel_o = REGFILE_ADDR_SEL_RD;
