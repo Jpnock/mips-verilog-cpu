@@ -1,9 +1,13 @@
+# TODO: Remove debug outputs.
+
 set -euo pipefail
 
 l="\033[34;1m"
 ll="\033[0m"
 
-TEST_FILES="test/mips/all/*.asm"
+SOURCE_DIR=${1:-rtl}
+TEST_INSTR=${2:-all}
+TEST_FILES=$([[ "$TEST_INSTR" == "all" ]] && echo "test/mips/all/*.asm" || echo "test/mips/all/*_${TEST_INSTR}_*.asm")
 
 for file in $TEST_FILES; do
 
@@ -18,7 +22,7 @@ for file in $TEST_FILES; do
     printf "$l▶$ll Building Test: $(basename $file)\n" $
 
     #Build TB
-    iverilog -DDEBUG -Wall -g 2012 rtl/**/*.v rtl/*.v \
+    iverilog -DDEBUG -Wall -g 2012 ${SOURCE_DIR}/**/*.v ${SOURCE_DIR}/*.v \
         -s mips_cpu_bus_tb \
         -P mips_cpu_bus_tb.EXPECTED_VALUE="$expected_value" \
         -P mips_cpu_bus_tb.RAM_FILE=\"${file}.hex\" \

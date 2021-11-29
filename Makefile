@@ -23,7 +23,7 @@ build-tests:
 
 test:
 	@mkdir -p bin
-	@./test/run_verilog_testbench.sh || exit 1
+	@./test/run_verilog_testbench.sh rtl all || exit 1
 
 run:
 	@printf "\033[34;1m▶\033[0m Running ./bin/mips_cpu.out\n"
