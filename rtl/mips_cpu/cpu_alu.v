@@ -174,7 +174,7 @@ module alu (
       mf_q <= 0;
     end else if (opcode_i == OP_SPECIAL) begin
       case (funct_i)
-        FUNC_MULT, FUNC_MULTU, FUNC_DIV, FUNC_DIVU, FUNC_MTHI, FUNC_MTLO: begin
+        FUNC_MULT, FUNC_MULTU, FUNC_DIV, FUNC_DIVU: begin
           mf_q <= mf_d;
         end
         FUNC_MTHI: mf_q[63:32] <= rs_i;
