@@ -1,50 +1,66 @@
 # TODO: Remove debug outputs.
 
-set -euo pipefail
-
-l="\033[34;1m"
-ll="\033[0m"
+set -uo pipefail
 
 SOURCE_DIR=${1:-rtl}
-TEST_INSTR=${2:-all}
-TEST_FILES=$([[ "$TEST_INSTR" == "all" ]] && echo "test/mips/all/*.asm" || echo "test/mips/all/*_${TEST_INSTR}_*.asm")
+TEST_INSTR=${2-}
+TEST_FILES=$([[ -z "$TEST_INSTR" ]] && echo "test/mips/**/*.asm" || echo "test/mips/${TEST_INSTR}/*.asm")
+
+EXIT_CODE=0
 
 for file in $TEST_FILES; do
+    base_name=$(basename $file)
+    dir_name=$(basename $(dirname $file))
+    unique_name="${dir_name}_${base_name%.asm}"
+
+    mkdir -p ./bin
 
     # Logging/Output Files
     out="./bin/$(basename $file).out"
-    outlog="./bin/$(basename $file).log"
+    buildlog="./bin/$(basename $file).build.log"
+    testlog="./bin/$(basename $file).test.log"
+
+    fail_file() {
+        echo "${unique_name} ${dir_name} Fail"
+        EXIT_CODE=1
+    }
 
     # Extract Expected Value
-    read -r expected_value <$file
-    expected_value=$(echo $expected_value | sed 's/^.*Expect: //')
-
-    printf "$l▶$ll Building Test: $(basename $file)\n" $
+    expected_value=$(head -n 1 "$file" | sed -n -e 's/^# Expect: //p')
+    if [[ -z $expected_value ]]; then
+        fail_file
+        continue
+    fi
 
     #Build TB
-    iverilog -DDEBUG -Wall -g 2012 ${SOURCE_DIR}/**/*.v ${SOURCE_DIR}/*.v \
+    iverilog -DDEBUG -Wall -g 2012 \
+        ${SOURCE_DIR}/mips_cpu/*.v ${SOURCE_DIR}/mips_cpu_*.v \
         -pfileline=1 \
         -s mips_cpu_bus_tb \
         -P mips_cpu_bus_tb.EXPECTED_VALUE="$expected_value" \
         -P mips_cpu_bus_tb.RAM_FILE=\"${file}.hex\" \
-        -o "$out" 2>&1 | sed 's/^/  /'
-
-    printf "$l...$ll Built!\n"
+        -o "$out" > "${buildlog}" 2>&1
+    if [[ $? -ne 0 ]]; then
+        fail_file
+        continue
+    fi
 
     # Run
-    printf "$l▶$ll Running Test: $(basename $file)\n" $
-    ./$out >"${outlog}" 2>&1 || (
-        cat "${outlog}" | sed 's/^/  /'
-        exit 1
-    )
+    timeout 15s ./$out > "${testlog}" 2>&1
+    if [[ $? -ne 0 ]]; then
+        fail_file
+        continue
+    fi
 
     # Error
-    grep -q -i "Error:" "${outlog}" >/dev/null && (
-        cat "${outlog}" | sed 's/^/  /'
-        printf "$l ...$ll failed %s\n"
-        exit 1
-    )
+    # TODO: maybe remove this before submission?
+    grep -q -i -v "^ERROR:" "${testlog}" > /dev/null 2>&1
+    if [[ $? -ne 0 ]]; then
+        fail_file
+        continue
+    fi
 
-    printf "$l...$ll Passed!\n"
-
+    echo "${unique_name} ${dir_name} Pass"
 done
+
+exit ${EXIT_CODE}

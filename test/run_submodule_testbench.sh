@@ -25,7 +25,7 @@ for file in $TEST_FILES; do
         -s $TB_NAME \
         -o "$out" 2>&1 | sed 's/^/  /'
 
-    printf "$l...$ll Built!\n"
+    printf "$l ...$ll Built!\n"
 
     # Run
     printf "$l▶$ll Running Test: $(basename $TB_NAME)\n" $
@@ -41,6 +41,6 @@ for file in $TEST_FILES; do
         exit 1
     )
 
-    printf "$l...$ll Passed!\n"
+    printf "$l ...$ll Passed!\n"
 
 done

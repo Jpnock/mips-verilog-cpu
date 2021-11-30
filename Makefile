@@ -23,8 +23,12 @@ build-tests:
 
 test:
 	@mkdir -p bin
-	@./test/run_submodule_testbench.sh || exit 1
-	@./test/run_instruction_testbench.sh rtl all || exit 1
+	@printf "\033[34;1m▶\033[0m Running Verilog testbenches\n\n"
+	@./test/run_submodule_testbench.sh
+	@printf "\n\033[34;1m...\033[0m Verilog testbenches passed\n"
+	@printf "\n\033[34;1m▶\033[0m Running ASM testbenches\n\n"
+	@./test/test_mips_cpu_bus.sh rtl
+	@printf "\n\033[34;1m ...\033[0m ASM testbenches passed\n"
 
 run:
 	@printf "\033[34;1m▶\033[0m Running ./bin/mips_cpu.out\n"
