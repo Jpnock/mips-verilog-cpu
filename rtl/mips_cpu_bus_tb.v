@@ -13,6 +13,9 @@ module mips_cpu_bus_tb ();
   logic [3:0] byteenable;
   logic [31:0] readdata;
 
+  parameter RAM_FILE = "";
+  parameter EXPECTED_VALUE = -1;
+
   initial begin
     $dumpfile("mips_cpu_bus_tb.vcd");
     $dumpvars(0, mips_cpu_bus_tb);
@@ -22,6 +25,8 @@ module mips_cpu_bus_tb ();
     repeat (256) begin
       #2 clk = !clk;
     end
+    assert (register_v0 == EXPECTED_VALUE)
+    else $fatal(0, "Testbench failed.");
     $finish;
   end
 
@@ -54,7 +59,9 @@ module mips_cpu_bus_tb ();
       .readdata(readdata)
   );
 
-  cpu_ram cpu_ram (
+  cpu_ram #(
+      .RAM_FILE(RAM_FILE)
+  ) cpu_ram (
       .clk(clk),
       .read(read),
       .write(write),
