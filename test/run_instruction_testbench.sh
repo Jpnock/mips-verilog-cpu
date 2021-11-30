@@ -13,12 +13,12 @@ for file in $TEST_FILES; do
     dir_name=$(basename $(dirname $file))
     unique_name="${dir_name}_${base_name%.asm}"
 
-    mkdir -p ./bin
+    mkdir -p ./test/bin
 
     # Logging/Output Files
-    out="./bin/$(basename $file).out"
-    buildlog="./bin/$(basename $file).build.log"
-    testlog="./bin/$(basename $file).test.log"
+    out="./test/bin/${unique_name}.out"
+    buildlog="./test/bin/${unique_name}.build.log"
+    testlog="./test/bin/${unique_name}.test.log"
 
     fail_file() {
         echo "${unique_name} ${dir_name} Fail"

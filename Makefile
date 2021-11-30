@@ -9,10 +9,11 @@ all: clean build build-tests test
 
 clean:
 	@rm -f bin/*
+	@rm -f test/bin/*
 
 build:
 	@printf "\033[34;1m▶\033[0m Building\n"
-	@mkdir -p bin
+	@mkdir -p bin test/bin
 	@$(BUILD_CMD) -o bin/mips_cpu.out 2>&1 | sed 's/^/  /'
 	@printf "\033[34;1m ...\033[0m built\n"
 
@@ -22,7 +23,7 @@ build-tests:
 	@printf "\033[34;1m ...\033[0m assembled\n"
 
 test:
-	@mkdir -p bin
+	@mkdir -p bin test/bin
 	@printf "\033[34;1m▶\033[0m Running Verilog testbenches\n\n"
 	@./test/run_submodule_testbench.sh
 	@printf "\n\033[34;1m...\033[0m Verilog testbenches passed\n"
