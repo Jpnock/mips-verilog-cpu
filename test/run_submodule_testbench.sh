@@ -12,6 +12,7 @@ for file in $TEST_FILES; do
     # TB Name
     TB_NAME=$(basename $file)
     TB_NAME=$(echo ${TB_NAME%.*})
+    TB_NAME=${TB_NAME/svm_/}
 
     # Logging/Output Files
     out="./bin/$(basename $TB_NAME).out"
@@ -20,7 +21,7 @@ for file in $TEST_FILES; do
     printf "$l▶$ll Building Test: $(basename $TB_NAME)\n" $
 
     # Build TB
-    iverilog -DDEBUG -Wall -g 2012 rtl/**/*.v rtl/*.v \
+    iverilog -DDEBUG -Wall -g 2012 rtl/mips_cpu/*.v rtl/mips_cpu_*.v \
         -pfileline=1 \
         -s $TB_NAME \
         -o "$out" 2>&1 | sed 's/^/  /'
