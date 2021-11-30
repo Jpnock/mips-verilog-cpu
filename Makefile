@@ -1,9 +1,9 @@
-SHELL := bash -euo pipefail -O extglob -c
+SHELL := bash -euo pipefail
 
 .PHONY: all clean build build-tests test run
 
 M := $(shell printf "\033[34;1m▶\033[0m")
-BUILD_CMD := iverilog -pfileline=1 -DDEBUG -Wall -g 2012 rtl/mips_cpu/package.v rtl/mips_cpu/!(package).v rtl/*.v
+BUILD_CMD := iverilog -pfileline=1 -DDEBUG -Wall -g 2012 rtl/**/*.v rtl/*.v
 
 all: clean build build-tests test
 
@@ -11,7 +11,6 @@ clean:
 	@rm -f bin/*
 
 build:
-	@shopt -s extglob
 	@printf "\033[34;1m▶\033[0m Building\n"
 	@mkdir -p bin
 	@$(BUILD_CMD) -o bin/mips_cpu.out 2>&1 | sed 's/^/  /'

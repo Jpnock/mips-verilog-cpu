@@ -1,7 +1,6 @@
 # TODO: Remove debug outputs.
 
 set -uo pipefail
-shopt -s extglob
 
 SOURCE_DIR=${1:-rtl}
 TEST_INSTR=${2-}
@@ -34,34 +33,20 @@ for file in $TEST_FILES; do
     fi
 
     #Build TB
-    if [[ -f ${SOURCE_DIR}/mips_cpu/package.v ]]; then
-        iverilog -DDEBUG -Wall -g 2012 \
-            ${SOURCE_DIR}/mips_cpu/package.v ${SOURCE_DIR}/mips_cpu/!(package).v ${SOURCE_DIR}/*.v \
-            -pfileline=1 \
-            -s mips_cpu_bus_tb \
-            -P mips_cpu_bus_tb.EXPECTED_VALUE="$expected_value" \
-            -P mips_cpu_bus_tb.RAM_FILE=\"${file}.hex\" \
-            -o "$out" >"${buildlog}" 2>&1
-        if [[ $? -ne 0 ]]; then
-            fail_file
-            continue
-        fi
-    else
-        iverilog -DDEBUG -Wall -g 2012 \
-            ${SOURCE_DIR}/mips_cpu/*.v ${SOURCE_DIR}/mips_cpu_*.v \
-            -pfileline=1 \
-            -s mips_cpu_bus_tb \
-            -P mips_cpu_bus_tb.EXPECTED_VALUE="$expected_value" \
-            -P mips_cpu_bus_tb.RAM_FILE=\"${file}.hex\" \
-            -o "$out" >"${buildlog}" 2>&1
-        if [[ $? -ne 0 ]]; then
-            fail_file
-            continue
-        fi
+    iverilog -DDEBUG -Wall -g 2012 \
+        ${SOURCE_DIR}/mips_cpu/*.v ${SOURCE_DIR}/mips_cpu_*.v \
+        -pfileline=1 \
+        -s mips_cpu_bus_tb \
+        -P mips_cpu_bus_tb.EXPECTED_VALUE="$expected_value" \
+        -P mips_cpu_bus_tb.RAM_FILE=\"${file}.hex\" \
+        -o "$out" > "${buildlog}" 2>&1
+    if [[ $? -ne 0 ]]; then
+        fail_file
+        continue
     fi
 
     # Run
-    timeout 15s ./$out >"${testlog}" 2>&1
+    timeout 15s ./$out > "${testlog}" 2>&1
     if [[ $? -ne 0 ]]; then
         fail_file
         continue
@@ -69,7 +54,7 @@ for file in $TEST_FILES; do
 
     # Error
     # TODO: maybe remove this before submission?
-    grep -q -i -v "^ERROR:" "${testlog}" >/dev/null 2>&1
+    grep -q -i -v "^ERROR:" "${testlog}" > /dev/null 2>&1
     if [[ $? -ne 0 ]]; then
         fail_file
         continue

@@ -1,6 +1,5 @@
 # TODO: Not a deliverable.
 
-shopt -s extglob
 set -euo pipefail
 
 l="\033[34;1m"
@@ -21,7 +20,7 @@ for file in $TEST_FILES; do
     printf "$l▶$ll Building Test: $(basename $TB_NAME)\n" $
 
     # Build TB
-    iverilog -DDEBUG -Wall -g 2012 rtl/mips_cpu/package.v rtl/mips_cpu/!(package).v rtl/*.v \
+    iverilog -DDEBUG -Wall -g 2012 rtl/**/*.v rtl/*.v \
         -pfileline=1 \
         -s $TB_NAME \
         -o "$out" 2>&1 | sed 's/^/  /'
