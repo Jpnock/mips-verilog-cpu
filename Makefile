@@ -13,7 +13,7 @@ clean:
 build:
 	@printf "\033[34;1m▶\033[0m Building\n"
 	@mkdir -p bin
-	@$(BUILD_CMD) -o bin/mips_cpu.out 2>&1 | sed 's/^/  /'
+	@iverilog -pfileline=1 -DDEBUG -Wall -g 2012 rtl/mips_cpu/package.v rtl/mips_cpu/!(package).v rtl/*.v -o bin/mips_cpu.out 2>&1 | sed 's/^/  /'
 	@printf "\033[34;1m ...\033[0m built\n"
 
 build-tests:
