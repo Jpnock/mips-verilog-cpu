@@ -1,8 +1,20 @@
-#expect the address to change to (current address + 4 + 72 = current address + 76)
+#Expect: 0x0334AF70
 
-addi	$v0, $v0, -4         # $v0 = $v0 + 14
+.text
+.globl main
+main: 
+    lw      $v0, var1   
+    blez	$v0, L1
 
-blez    $v0, 18
+L1: 
+    addi    $v0, $v0, var3
+    blez	$v0, L2
 
-jr $ra
-sll $zero, $zero, 0
+L2: 
+    lw      $v0, var2
+    blez	$v0, main
+
+.data
+var1: .word 0x00000000
+var2: .word 0x0334AF70
+var3: .word 0xF0000000

@@ -1,9 +1,13 @@
-#expect the address to change to (current address + 4 + 68 = current address + 72)
+#Expect: 0x0000468A
 
-addi	$v0, $v0, 3         # $v0 = $v0 + 3
-addi	$v1, $v1, 3			# $v1 = $v1 + 3
+.text
+.globl main
+main: 
+    addi	$v0, $v0, var1        
+    lw	$v1, $v1, var2
+    beq		$v0, $v1, main	
 
-beq		$v0, $v1, 0x17	# if $v0 == $v1 then target
+.data
 
-jr $ra
-sll $zero, $zero, 0
+var1: .word 0x00002345
+var2: .word 0x00002345
