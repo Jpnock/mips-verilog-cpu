@@ -206,10 +206,8 @@ module alu (
       // jump condition from. This seems to be a compiler restriction, though. 
       OP_REGIMM: begin
         case (regimm_i)
-          REGIMM_BLTZ:   b_cond_met_o = (rs_i < 0) ? 1'b1 : 1'b0;
-          REGIMM_BGEZ:   b_cond_met_o = (rs_i >= 0) ? 1'b1 : 1'b0;
-          REGIMM_BLTZAL: b_cond_met_o = (rs_i < 0) ? 1'b1 : 1'b0;
-          REGIMM_BGEZAL: b_cond_met_o = (rs_i >= 0) ? 1'b1 : 1'b0;
+          REGIMM_BLTZ, REGIMM_BLTZAL:   b_cond_met_o = (rs_i < 0) ? 1'b1 : 1'b0;
+          REGIMM_BGEZ, REGIMM_BGEZAL:   b_cond_met_o = (rs_i >= 0) ? 1'b1 : 1'b0;
         endcase
       end
     endcase
