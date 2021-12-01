@@ -206,8 +206,8 @@ module alu (
       // jump condition from. This seems to be a compiler restriction, though. 
       OP_REGIMM: begin
         case (regimm_i)
-          REGIMM_BLTZ, REGIMM_BLTZAL:   b_cond_met_o = (rs_i < 0) ? 1'b1 : 1'b0;
-          REGIMM_BGEZ, REGIMM_BGEZAL:   b_cond_met_o = (rs_i >= 0) ? 1'b1 : 1'b0;
+          REGIMM_BLTZ, REGIMM_BLTZAL: b_cond_met_o = (rs_i < 0) ? 1'b1 : 1'b0;
+          REGIMM_BGEZ, REGIMM_BGEZAL: b_cond_met_o = (rs_i >= 0) ? 1'b1 : 1'b0;
         endcase
       end
     endcase
@@ -235,7 +235,7 @@ module alu (
       end
 
       // PC region jumps
-      OP_J, OP_JAL: effective_address_o = {pc_i[31:26], target_i};
+      OP_J, OP_JAL: effective_address_o = {pc_i[31:28], target_i, 2'b00};
 
       // register jumps
       OP_SPECIAL: begin
