@@ -59,7 +59,7 @@ module mips_cpu_bus (
   size_t mfhi, mflo, alu_out, effective_address;
 
   //TODO: Add wait request stalls later.
-  assign stall = 0;
+  assign stall = (read || write) && waitrequest;
   assign halt  = (pc_o == 0) ? 1 : 0;
   fsm fsm (
       .clk(clk),
@@ -78,6 +78,8 @@ module mips_cpu_bus (
 `endif
 
   control control (
+      .clk(clk),
+      .stall_i(stall),
       .state_i(state),
       .opcode_i(opcode),
       .function_i(funct),
@@ -108,7 +110,6 @@ module mips_cpu_bus (
 
   ir ir (
       .clk(clk),
-      .state_i(state),
       .wen_i(ir_write_en),
       .reset_i(reset),
       .instr_i(readdata_bigendian),

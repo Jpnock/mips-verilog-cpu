@@ -2,7 +2,6 @@ import codes::*;
 
 module ir (
     input logic clk,
-    input state_t state_i,
     input logic wen_i,
     input logic reset_i,
     input size_t instr_i,
@@ -24,7 +23,7 @@ module ir (
   always_ff @(posedge clk) begin
     if (reset_i) begin
       ihold <= 0;
-    end else if (state_i == EXEC1) begin
+    end else if (wen_i) begin
 `ifdef DEBUG
       if (opcode_o == OP_SPECIAL) begin
         func_display(funct_o);
@@ -41,7 +40,7 @@ module ir (
     end
   end
 
-  assign data = (state_i == EXEC1) ? instr_i : ihold;
+  assign data = (wen_i) ? instr_i : ihold;
   assign opcode_o = logic_to_opcode(data[31:26]);
   assign target_o = data[25:0];
   assign rs_o = data[25:21];
