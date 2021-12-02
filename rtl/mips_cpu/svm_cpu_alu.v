@@ -66,10 +66,10 @@ module alu (
         case (funct_i)
           FUNC_SLL:  rd_o = rt_i << static_shift_amount;
           FUNC_SRL:  rd_o = rt_i >> static_shift_amount;
-          FUNC_SRA:  rd_o = rt_i >>> static_shift_amount;
+          FUNC_SRA:  rd_o = $signed(rt_i) >>> static_shift_amount;
           FUNC_SLLV: rd_o = rt_i << variable_shift_amount;
           FUNC_SRLV: rd_o = rt_i >> variable_shift_amount;
-          FUNC_SRAV: rd_o = rt_i >>> variable_shift_amount;
+          FUNC_SRAV: rd_o = $signed(rt_i) >>> variable_shift_amount;
           FUNC_ADD: begin
             // TODO: fire exception on overflow
             rd_o = rs_i + rt_i;
