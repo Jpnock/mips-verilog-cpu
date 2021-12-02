@@ -190,8 +190,8 @@ module alu (
     // branch condition
     case (opcode_i)
       OP_BEQ:  b_cond_met_o = (rs_i == rt_i) ? 1'b1 : 1'b0;
-      OP_BGTZ: b_cond_met_o = (rs_i > 0) ? 1'b1 : 1'b0;
-      OP_BLEZ: b_cond_met_o = (rs_i <= 0) ? 1'b1 : 1'b0;
+      OP_BGTZ: b_cond_met_o = ($signed(rs_i) > 0) ? 1'b1 : 1'b0;
+      OP_BLEZ: b_cond_met_o = ($signed(rs_i) <= 0) ? 1'b1 : 1'b0;
       OP_BNE:  b_cond_met_o = (rs_i != rt_i) ? 1'b1 : 1'b0;
 
       OP_J, OP_JAL: b_cond_met_o = 1'b1;
@@ -206,8 +206,8 @@ module alu (
       // jump condition from. This seems to be a compiler restriction, though. 
       OP_REGIMM: begin
         case (regimm_i)
-          REGIMM_BLTZ, REGIMM_BLTZAL: b_cond_met_o = (rs_i < 0) ? 1'b1 : 1'b0;
-          REGIMM_BGEZ, REGIMM_BGEZAL: b_cond_met_o = (rs_i >= 0) ? 1'b1 : 1'b0;
+          REGIMM_BLTZ, REGIMM_BLTZAL: b_cond_met_o = ($signed(rs_i) < 0) ? 1'b1 : 1'b0;
+          REGIMM_BGEZ, REGIMM_BGEZAL: b_cond_met_o = ($signed(rs_i) >= 0) ? 1'b1 : 1'b0;
         endcase
       end
     endcase
