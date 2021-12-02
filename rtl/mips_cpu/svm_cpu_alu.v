@@ -58,7 +58,12 @@ module alu (
   logic [4:0] variable_shift_amount;
   assign variable_shift_amount = rs_i[4:0];
 
-  //assign effective_address_o   = sign_extended_imm + rs_i;
+  size_t next_pc_i;
+  assign next_pc_i = pc_i + 4;
+
+  logic [3:0] next_pc_i_upper_4_bits;
+  assign next_pc_i_upper_4_bits = next_pc_i[31:28];
+
 
   always_comb begin
     case (opcode_i)
@@ -235,7 +240,8 @@ module alu (
       end
 
       // PC region jumps
-      OP_J, OP_JAL: effective_address_o = {pc_i[31:28], target_i, 2'b00};
+      // These instructions use the upper four bits of the branch delay slot.
+      OP_J, OP_JAL: effective_address_o = {next_pc_i_upper_4_bits, word_target_i};
 
       // register jumps
       OP_SPECIAL: begin
