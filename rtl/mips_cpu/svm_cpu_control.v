@@ -94,7 +94,8 @@ module control (
         case (regimm_i)
           REGIMM_BGEZAL, REGIMM_BLTZAL: begin
             if (isStateEXEC2) begin
-              regfile_write_en_o   = b_cond_met_i;
+              // MIPS will always write to the link register, regardless of if the branch condition is met!
+              regfile_write_en_o   = 1;
               regfile_addr_3_sel_o = REGFILE_ADDR_SEL_GPR31;
             end
           end
