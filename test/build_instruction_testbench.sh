@@ -1,4 +1,4 @@
-for f in mips/**/*.asm
+for f in mips/**/**/**/*.asm
 do
     mips-linux-gnu-as -R -mips1 -o "$f.out" "$f"
     mips-linux-gnu-ld -e 0xBFC00000 -Ttext 0xBFC00000 -o "$f.out.reloc" "$f.out"
