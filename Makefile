@@ -27,9 +27,12 @@ test:
 	@printf "\033[34;1m▶\033[0m Running Verilog testbenches\n\n"
 	@./test/run_submodule_testbench.sh
 	@printf "\n\033[34;1m...\033[0m Verilog testbenches passed\n"
-	@printf "\n\033[34;1m▶\033[0m Running ASM testbenches\n\n"
-	@./test/test_mips_cpu_bus.sh rtl
-	@printf "\n\033[34;1m ...\033[0m ASM testbenches passed\n"
+	@printf "\n\033[34;1m▶\033[0m Running ASM testbenches without waitrequest\n\n"
+	@./test/test_mips_cpu_bus.sh rtl all 0
+	@printf "\n\033[34;1m ...\033[0m ASM testbenches without waitrequest passed\n"
+	@printf "\n\033[34;1m▶\033[0m Running ASM testbenches with waitrequest\n\n"
+	@./test/test_mips_cpu_bus.sh rtl all 1
+	@printf "\n\033[34;1m ...\033[0m ASM testbenches with waitrequest passed\n"
 
 run:
 	@printf "\033[34;1m▶\033[0m Running ./bin/mips_cpu.out\n"
