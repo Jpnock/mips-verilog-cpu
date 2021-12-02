@@ -14,7 +14,9 @@ module mips_cpu_bus_tb ();
   logic [31:0] readdata;
 
   parameter RAM_FILE = "";
-  parameter EXPECTED_VALUE = -1;
+  parameter Expect_VALUE = -1;
+  size_t expected_value_reg;
+  assign expected_value_reg = Expect_VALUE;
 
   initial begin
     $dumpfile("mips_cpu_bus_tb.vcd");
@@ -25,7 +27,7 @@ module mips_cpu_bus_tb ();
     repeat (256) begin
       #2 clk = !clk;
     end
-    assert (register_v0 == EXPECTED_VALUE)
+    assert (register_v0 == expected_value_reg)
     else $fatal(0, "Testbench failed.");
     $finish;
   end

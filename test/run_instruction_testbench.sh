@@ -4,7 +4,7 @@ set -uo pipefail
 
 SOURCE_DIR=${1:-rtl}
 TEST_INSTR=${2-}
-TEST_FILES=$([[ -z "$TEST_INSTR" ]] && echo "test/mips/**/*.asm" || echo "test/mips/${TEST_INSTR}/*.asm")
+TEST_FILES=$([[ -z "$TEST_INSTR" ]] && echo "test/mips/**/*.asm"|| echo "test/mips/${TEST_INSTR}/*.asm")
 
 EXIT_CODE=0
 
@@ -25,9 +25,9 @@ for file in $TEST_FILES; do
         EXIT_CODE=1
     }
 
-    # Extract Expected Value
-    expected_value=$(head -n 1 "$file" | sed -n -e 's/^# Expect: //p')
-    if [[ -z $expected_value ]]; then
+    # Extract Expect Value
+    Expect_value=$(head -n 1 "$file" | sed -n -e 's/^# Expect: //p')
+    if [[ -z $Expect_value ]]; then
         fail_file
         continue
     fi
@@ -37,7 +37,7 @@ for file in $TEST_FILES; do
         ${SOURCE_DIR}/mips_cpu/*.v ${SOURCE_DIR}/mips_cpu_*.v \
         -pfileline=1 \
         -s mips_cpu_bus_tb \
-        -P mips_cpu_bus_tb.EXPECTED_VALUE="$expected_value" \
+        -P mips_cpu_bus_tb.Expect_VALUE="$Expect_value" \
         -P mips_cpu_bus_tb.RAM_FILE=\"${file}.hex\" \
         -o "$out" > "${buildlog}" 2>&1
     if [[ $? -ne 0 ]]; then
