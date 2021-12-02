@@ -58,7 +58,14 @@ module alu (
   logic [4:0] variable_shift_amount;
   assign variable_shift_amount = rs_i[4:0];
 
-  //assign effective_address_o   = sign_extended_imm + rs_i;
+  size_t next_pc_i;
+  assign next_pc_i = pc_i + 4;
+
+  logic [3:0] next_pc_i_upper_4_bits;
+  assign next_pc_i_upper_4_bits = next_pc_i[31:28];
+
+  logic [27:0] word_target_i;
+  assign word_target_i = {target_i, 2'b00};
 
   always_comb begin
     case (opcode_i)
@@ -66,10 +73,10 @@ module alu (
         case (funct_i)
           FUNC_SLL:  rd_o = rt_i << static_shift_amount;
           FUNC_SRL:  rd_o = rt_i >> static_shift_amount;
-          FUNC_SRA:  rd_o = rt_i >>> static_shift_amount;
+          FUNC_SRA:  rd_o = $signed(rt_i) >>> static_shift_amount;
           FUNC_SLLV: rd_o = rt_i << variable_shift_amount;
           FUNC_SRLV: rd_o = rt_i >> variable_shift_amount;
-          FUNC_SRAV: rd_o = rt_i >>> variable_shift_amount;
+          FUNC_SRAV: rd_o = $signed(rt_i) >>> variable_shift_amount;
           FUNC_ADD: begin
             // TODO: fire exception on overflow
             rd_o = rs_i + rt_i;
@@ -190,8 +197,8 @@ module alu (
     // branch condition
     case (opcode_i)
       OP_BEQ:  b_cond_met_o = (rs_i == rt_i) ? 1'b1 : 1'b0;
-      OP_BGTZ: b_cond_met_o = (rs_i > 0) ? 1'b1 : 1'b0;
-      OP_BLEZ: b_cond_met_o = (rs_i <= 0) ? 1'b1 : 1'b0;
+      OP_BGTZ: b_cond_met_o = ($signed(rs_i) > 0) ? 1'b1 : 1'b0;
+      OP_BLEZ: b_cond_met_o = ($signed(rs_i) <= 0) ? 1'b1 : 1'b0;
       OP_BNE:  b_cond_met_o = (rs_i != rt_i) ? 1'b1 : 1'b0;
 
       OP_J, OP_JAL: b_cond_met_o = 1'b1;
@@ -206,8 +213,8 @@ module alu (
       // jump condition from. This seems to be a compiler restriction, though. 
       OP_REGIMM: begin
         case (regimm_i)
-          REGIMM_BLTZ, REGIMM_BLTZAL: b_cond_met_o = (rs_i < 0) ? 1'b1 : 1'b0;
-          REGIMM_BGEZ, REGIMM_BGEZAL: b_cond_met_o = (rs_i >= 0) ? 1'b1 : 1'b0;
+          REGIMM_BLTZ, REGIMM_BLTZAL: b_cond_met_o = ($signed(rs_i) < 0) ? 1'b1 : 1'b0;
+          REGIMM_BGEZ, REGIMM_BGEZAL: b_cond_met_o = ($signed(rs_i) >= 0) ? 1'b1 : 1'b0;
         endcase
       end
     endcase
@@ -235,7 +242,8 @@ module alu (
       end
 
       // PC region jumps
-      OP_J, OP_JAL: effective_address_o = {pc_i[31:28], target_i, 2'b00};
+      // These instructions use the upper four bits of the branch delay slot.
+      OP_J, OP_JAL: effective_address_o = {next_pc_i_upper_4_bits, word_target_i};
 
       // register jumps
       OP_SPECIAL: begin

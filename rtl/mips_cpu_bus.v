@@ -97,10 +97,7 @@ module mips_cpu_bus (
       .regfile_addr_3_sel_o(regfile_addr_3_sel)
   );
 
-  // TODO: For JR only. Change if required.
-  assign pc_i = rs_regfile_data;
-  // TODO: Add proper control logic for when branch conditions are met.
-  //assign b_cond_met = ((opcode == OP_SPECIAL) && (funct == FUNC_JR)) ? 1 : 0;
+  assign pc_i = effective_address;
 
   pc pc (
       .clk(clk),
