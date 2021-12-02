@@ -64,6 +64,8 @@ module alu (
   logic [3:0] next_pc_i_upper_4_bits;
   assign next_pc_i_upper_4_bits = next_pc_i[31:28];
 
+  logic [27:0] word_target_i;
+  assign word_target_i = {target_i, 2'b00};
 
   always_comb begin
     case (opcode_i)
