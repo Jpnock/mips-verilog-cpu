@@ -5,7 +5,7 @@ set -uo pipefail
 
 SOURCE_DIR=${1:-rtl}
 TEST_INSTR=${2-}
-TEST_WAIT=${3:-0}
+TEST_WAIT=${3:-1}
 TEST_FILES=$([[ -z "$TEST_INSTR" ]] && echo "test/mips/**/*.asm" || echo "test/mips/${TEST_INSTR}/*.asm")
 
 EXIT_CODE=0
