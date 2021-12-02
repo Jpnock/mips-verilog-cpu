@@ -5,6 +5,7 @@ module ir (
     input logic wen_i,
     input logic reset_i,
     input size_t instr_i,
+    output full_op_t full_op_o,
     output opcode_t opcode_o,
     output func_t funct_o,
     output regimm_t regimm_o,
@@ -35,12 +36,12 @@ module ir (
         $display("%08h, %06b, %06b", data, opcode_o, funct_o);
       end
 `endif
-
       ihold <= instr_i;
     end
   end
 
   assign data = (wen_i) ? instr_i : ihold;
+  assign full_op_o = logic_to_full_op(data);
   assign opcode_o = logic_to_opcode(data[31:26]);
   assign target_o = data[25:0];
   assign rs_o = data[25:21];
@@ -214,5 +215,69 @@ module ir (
     endcase
   endtask
 `endif
+
+  function automatic full_op_t logic_to_full_op(logic [31:0] i);
+    case (i)
+      FOP_J:       logic_to_full_op = FOP_J;
+      FOP_JAL:     logic_to_full_op = FOP_JAL;
+      FOP_BEQ:     logic_to_full_op = FOP_BEQ;
+      FOP_BNE:     logic_to_full_op = FOP_BNE;
+      FOP_BLEZ:    logic_to_full_op = FOP_BLEZ;
+      FOP_BGTZ:    logic_to_full_op = FOP_BGTZ;
+      FOP_ADDI:    logic_to_full_op = FOP_ADDI;
+      FOP_ADDIU:   logic_to_full_op = FOP_ADDIU;
+      FOP_SLTI:    logic_to_full_op = FOP_SLTI;
+      FOP_SLTIU:   logic_to_full_op = FOP_SLTIU;
+      FOP_ANDI:    logic_to_full_op = FOP_ANDI;
+      FOP_ORI:     logic_to_full_op = FOP_ORI;
+      FOP_XORI:    logic_to_full_op = FOP_XORI;
+      FOP_LUI:     logic_to_full_op = FOP_LUI;
+      FOP_LB:      logic_to_full_op = FOP_LB;
+      FOP_LH:      logic_to_full_op = FOP_LH;
+      FOP_LWL:     logic_to_full_op = FOP_LWL;
+      FOP_LW:      logic_to_full_op = FOP_LW;
+      FOP_LBU:     logic_to_full_op = FOP_LBU;
+      FOP_LHU:     logic_to_full_op = FOP_LHU;
+      FOP_LWR:     logic_to_full_op = FOP_LWR;
+      FOP_SB:      logic_to_full_op = FOP_SB;
+      FOP_SH:      logic_to_full_op = FOP_SH;
+      FOP_SWL:     logic_to_full_op = FOP_SWL;
+      FOP_SW:      logic_to_full_op = FOP_SW;
+      FOP_SWR:     logic_to_full_op = FOP_SWR;
+      FOP_SLL:     logic_to_full_op = FOP_SLL;
+      FOP_SRL:     logic_to_full_op = FOP_SRL;
+      FOP_SRA:     logic_to_full_op = FOP_SRA;
+      FOP_SLLV:    logic_to_full_op = FOP_SLLV;
+      FOP_SRLV:    logic_to_full_op = FOP_SRLV;
+      FOP_SRAV:    logic_to_full_op = FOP_SRAV;
+      FOP_JR:      logic_to_full_op = FOP_JR;
+      FOP_JALR:    logic_to_full_op = FOP_JALR;
+      FOP_SYSCALL: logic_to_full_op = FOP_SYSCALL;
+      FOP_BREAK:   logic_to_full_op = FOP_BREAK;
+      FOP_MFHI:    logic_to_full_op = FOP_MFHI;
+      FOP_MTHI:    logic_to_full_op = FOP_MTHI;
+      FOP_MFLO:    logic_to_full_op = FOP_MFLO;
+      FOP_MTLO:    logic_to_full_op = FOP_MTLO;
+      FOP_MULT:    logic_to_full_op = FOP_MULT;
+      FOP_MULTU:   logic_to_full_op = FOP_MULTU;
+      FOP_DIV:     logic_to_full_op = FOP_DIV;
+      FOP_DIVU:    logic_to_full_op = FOP_DIVU;
+      FOP_ADD:     logic_to_full_op = FOP_ADD;
+      FOP_ADDU:    logic_to_full_op = FOP_ADDU;
+      FOP_SUB:     logic_to_full_op = FOP_SUB;
+      FOP_SUBU:    logic_to_full_op = FOP_SUBU;
+      FOP_AND:     logic_to_full_op = FOP_AND;
+      FOP_OR:      logic_to_full_op = FOP_OR;
+      FOP_XOR:     logic_to_full_op = FOP_XOR;
+      FOP_NOR:     logic_to_full_op = FOP_NOR;
+      FOP_SLT:     logic_to_full_op = FOP_SLT;
+      FOP_SLTU:    logic_to_full_op = FOP_SLTU;
+      FOP_BLTZ:    logic_to_full_op = FOP_BLTZ;
+      FOP_BGEZ:    logic_to_full_op = FOP_BGEZ;
+      FOP_BLTZAL:  logic_to_full_op = FOP_BLTZAL;
+      FOP_BGEZAL:  logic_to_full_op = FOP_BGEZAL;
+      default:     logic_to_full_op = FOP_INVALID;
+    endcase
+  endfunction
 
 endmodule

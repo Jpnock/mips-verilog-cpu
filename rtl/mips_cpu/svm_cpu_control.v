@@ -6,6 +6,8 @@ module control (
     input state_t state_i,
     input opcode_t opcode_i,
     input func_t function_i,
+    input regimm_t regimm_i,
+    input logic b_cond_met_i,
     output logic pc_write_en_o,
     output logic ir_write_en_o,
     output logic ram_write_en_o,
@@ -84,11 +86,37 @@ module control (
               regfile_addr_3_sel_o = REGFILE_ADDR_SEL_RD;
             end
           end
+
+          FUNC_JALR: begin
+            if (isStateEXEC2) begin
+              regfile_write_en_o   = b_cond_met_i;
+              regfile_addr_3_sel_o = REGFILE_ADDR_SEL_RD;
+            end
+          end
           default: begin
             //$fatal(0, "Instruction undefined.");
           end
         endcase
       end
+      OP_JAL: begin
+        if (isStateEXEC2) begin
+          regfile_write_en_o   = b_cond_met_i;
+          regfile_addr_3_sel_o = REGFILE_ADDR_SEL_GPR31;
+        end
+      end
+      OP_REGIMM: begin
+        case (regimm_i)
+          REGIMM_BGEZAL, REGIMM_BLTZAL: begin
+            if (isStateEXEC2) begin
+              // MIPS will always write to the link register, regardless of if the branch condition is met!
+              regfile_write_en_o   = 1;
+              regfile_addr_3_sel_o = REGFILE_ADDR_SEL_GPR31;
+            end
+          end
+        endcase
+      end
+
     endcase
+
   end
 endmodule

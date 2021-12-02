@@ -115,9 +115,101 @@ package codes;
     REGIMM_BGEZAL = 5'b10001
   } regimm_t;
 
-  typedef enum logic {
-    REGFILE_ADDR_SEL_RT = 1'b0,
-    REGFILE_ADDR_SEL_RD = 1'b1
+  // TODO: Determine how we want to decode opcodes.
+  // The advantage of having the opcode as a single enum is that we can easily
+  // group the instructions by functionality. This reduces the complexity of the
+  // switch statements quite a bit. The downside of this is that it is
+  // less clear when rs, rt etc. should be used. 
+  typedef enum logic [31:0] {
+    FOP_INVALID = 32'b1,
+
+    FOP_J    = {OP_J, 26'bX},
+    FOP_JAL  = {OP_JAL, 26'bX},
+    FOP_BEQ  = {OP_BEQ, 26'bX},
+    FOP_BNE  = {OP_BNE, 26'bX},
+    FOP_BLEZ = {OP_BLEZ, 26'bX},
+    FOP_BGTZ = {OP_BGTZ, 26'bX},
+
+    FOP_ADDI  = {OP_ADDI, 26'bX},
+    FOP_ADDIU = {OP_ADDIU, 26'bX},
+    FOP_SLTI  = {OP_SLTI, 26'bX},
+    FOP_SLTIU = {OP_SLTIU, 26'bX},
+    FOP_ANDI  = {OP_ANDI, 26'bX},
+    FOP_ORI   = {OP_ORI, 26'bX},
+    FOP_XORI  = {OP_XORI, 26'bX},
+    FOP_LUI   = {OP_LUI, 26'bX},
+
+    // 100XXX
+    FOP_LB  = {OP_LB, 26'bX},
+    FOP_LH  = {OP_LH, 26'bX},
+    FOP_LWL = {OP_LWL, 26'bX},
+    FOP_LW  = {OP_LW, 26'bX},
+    FOP_LBU = {OP_LBU, 26'bX},
+    FOP_LHU = {OP_LHU, 26'bX},
+    FOP_LWR = {OP_LWR, 26'bX},
+
+    // 101XXX
+    FOP_SB  = {OP_SB, 26'bX},
+    FOP_SH  = {OP_SH, 26'bX},
+    FOP_SWL = {OP_SWL, 26'bX},
+    FOP_SW  = {OP_SW, 26'bX},
+    FOP_SWR = {OP_SWR, 26'bX},
+
+    // 000XXX
+    FOP_SLL  = {OP_SPECIAL, 20'bX, FUNC_SLL},
+    FOP_SRL  = {OP_SPECIAL, 20'bX, FUNC_SRL},
+    FOP_SRA  = {OP_SPECIAL, 20'bX, FUNC_SRA},
+    FOP_SLLV = {OP_SPECIAL, 20'bX, FUNC_SLLV},
+    FOP_SRLV = {OP_SPECIAL, 20'bX, FUNC_SRLV},
+    FOP_SRAV = {OP_SPECIAL, 20'bX, FUNC_SRAV},
+
+    // 001XXX
+    FOP_JR      = {OP_SPECIAL, 20'bX, FUNC_JR},
+    FOP_JALR    = {OP_SPECIAL, 20'bX, FUNC_JALR},
+    FOP_SYSCALL = {OP_SPECIAL, 20'bX, FUNC_SYSCALL},
+    FOP_BREAK   = {OP_SPECIAL, 20'bX, FUNC_BREAK},
+
+    // 010XXX
+    FOP_MFHI = {OP_SPECIAL, 20'bX, FUNC_MFHI},
+    FOP_MTHI = {OP_SPECIAL, 20'bX, FUNC_MTHI},
+    FOP_MFLO = {OP_SPECIAL, 20'bX, FUNC_MFLO},
+    FOP_MTLO = {OP_SPECIAL, 20'bX, FUNC_MTLO},
+
+    // 011XXX
+    FOP_MULT  = {OP_SPECIAL, 20'bX, FUNC_MULT},
+    FOP_MULTU = {OP_SPECIAL, 20'bX, FUNC_MULTU},
+    FOP_DIV   = {OP_SPECIAL, 20'bX, FUNC_DIV},
+    FOP_DIVU  = {OP_SPECIAL, 20'bX, FUNC_DIVU},
+
+    // 100XXX
+    FOP_ADD  = {OP_SPECIAL, 20'bX, FUNC_ADD},
+    FOP_ADDU = {OP_SPECIAL, 20'bX, FUNC_ADDU},
+    FOP_SUB  = {OP_SPECIAL, 20'bX, FUNC_SUB},
+    FOP_SUBU = {OP_SPECIAL, 20'bX, FUNC_SUBU},
+    FOP_AND  = {OP_SPECIAL, 20'bX, FUNC_AND},
+    FOP_OR   = {OP_SPECIAL, 20'bX, FUNC_OR},
+    FOP_XOR  = {OP_SPECIAL, 20'bX, FUNC_XOR},
+    FOP_NOR  = {OP_SPECIAL, 20'bX, FUNC_NOR},
+
+    // 101XXX
+    FOP_SLT  = {OP_SPECIAL, 20'bX, FUNC_SLT},
+    FOP_SLTU = {OP_SPECIAL, 20'bX, FUNC_SLTU},
+
+    FOP_BLTZ = {OP_REGIMM, 5'bX, REGIMM_BLTZ, 16'bX},
+    FOP_BGEZ = {OP_REGIMM, 5'bX, REGIMM_BGEZ, 16'bX},
+
+    // 10XXX
+    FOP_BLTZAL = {OP_REGIMM, 5'bX, REGIMM_BLTZAL, 16'bX},
+    FOP_BGEZAL = {OP_REGIMM, 5'bX, REGIMM_BGEZAL, 16'bX}
+
+  } full_op_t;
+
+
+
+  typedef enum logic [1:0] {
+    REGFILE_ADDR_SEL_RT    = 2'b00,
+    REGFILE_ADDR_SEL_RD    = 2'b01,
+    REGFILE_ADDR_SEL_GPR31 = 2'b10
   } regfile_addr_sel_t;
 
 endpackage

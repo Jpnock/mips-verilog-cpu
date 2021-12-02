@@ -26,13 +26,15 @@ module mips_cpu_bus (
 
   // FSM
   logic stall, halt;
-  state_t  state;
+  state_t state;
 
   // Control
-  func_t   funct;
+  full_op_t full_op;
+  func_t funct;
   opcode_t opcode;
   regimm_t regimm;
-  logic pc_write_en, ir_write_en, regfile_write_en, src_b_sel, ram_addr_sel, regfile_addr_3_sel;
+  logic pc_write_en, ir_write_en, regfile_write_en, src_b_sel, ram_addr_sel;
+  logic [1:0] regfile_addr_3_sel;
 
   // PC
   logic b_cond_met;
@@ -40,6 +42,7 @@ module mips_cpu_bus (
 
   // IR
   regaddr_t rs, rt, rd;
+  logic [25:0] target;  // J, JAL target address
   logic [15:0] immediate;
   logic [4:0] shift;
 
@@ -83,6 +86,8 @@ module mips_cpu_bus (
       .state_i(state),
       .opcode_i(opcode),
       .function_i(funct),
+      .regimm_i(regimm),
+      .b_cond_met_i(b_cond_met),
       .pc_write_en_o(pc_write_en),
       .ir_write_en_o(ir_write_en),
       .ram_write_en_o(write),
@@ -94,10 +99,7 @@ module mips_cpu_bus (
       .regfile_addr_3_sel_o(regfile_addr_3_sel)
   );
 
-  // TODO: For JR only. Change if required.
-  assign pc_i = rs_regfile_data;
-  // TODO: Add proper control logic for when branch conditions are met.
-  assign b_cond_met = ((opcode == OP_SPECIAL) && (funct == FUNC_JR)) ? 1 : 0;
+  assign pc_i = effective_address;
 
   pc pc (
       .clk(clk),
@@ -113,6 +115,7 @@ module mips_cpu_bus (
       .wen_i(ir_write_en),
       .reset_i(reset),
       .instr_i(readdata_bigendian),
+      .full_op_o(full_op),
       .opcode_o(opcode),
       .funct_o(funct),
       .regimm_o(regimm),
@@ -120,7 +123,8 @@ module mips_cpu_bus (
       .rs_o(rs),
       .rt_o(rt),
       .rd_o(rd),
-      .immediate_o(immediate)
+      .immediate_o(immediate),
+      .target_o(target)
   );
 
   always_comb begin
@@ -137,6 +141,10 @@ module mips_cpu_bus (
       REGFILE_ADDR_SEL_RT: begin
         addr_3  = rt;
         alu_out = rt_data_d;
+      end
+      REGFILE_ADDR_SEL_GPR31: begin
+        addr_3  = 5'd31;
+        alu_out = rd_data_d;
       end
       default: begin
 `ifdef DEBUG
@@ -169,16 +177,21 @@ module mips_cpu_bus (
 
   alu alu (
       .clk(clk),
+      .full_op_i(full_op),
       .reset_i(reset),
       .opcode_i(opcode),
       .funct_i(funct),
+      .regimm_i(regimm),
       .rs_i(rs_regfile_data),
       .rt_i(rt_regfile_data),
       .immediate_i(immediate),
+      .target_i(target),
+      .pc_i(pc_o),
       .ram_readdata_i(readdata_bigendian),
       .rd_o(rd_data_d),
       .rt_o(rt_data_d),
       .effective_address_o(effective_address),
+      .b_cond_met_o(b_cond_met),
       .mfhi_o(mfhi),
       .mflo_o(mflo)
   );
