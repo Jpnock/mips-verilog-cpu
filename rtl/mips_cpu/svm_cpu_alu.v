@@ -36,7 +36,7 @@ module alu (
 
   function automatic size_t signextend16to32(input [15:0] x);
     begin
-      return x[15] == 1 ? {16'hFFFF, x} : {16'b0, x};
+      return ((x & 16'h8000) != 0) ? {16'hFFFF, x} : {16'b0, x};
     end
   endfunction
 
@@ -48,7 +48,7 @@ module alu (
 
   function automatic size_t signextend8to32(input [7:0] x);
     begin
-      return x[7] == 1 ? {24'hFFFFFF, x} : {24'b0, x};
+      return ((x & 8'h80) != 0) ? {24'hFFFFFF, x} : {24'b0, x};
     end
   endfunction
 
