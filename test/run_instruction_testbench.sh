@@ -36,7 +36,7 @@ for file in $TEST_FILES; do
 
     #Build TB
     iverilog -DDEBUG -Wall -g 2012 \
-        ${SOURCE_DIR}/mips_cpu/*.v ${SOURCE_DIR}/mips_cpu_*.v \
+        ${SOURCE_DIR}/mips_cpu/*.v ${SOURCE_DIR}/mips_cpu_*.v ./test/rtl/*.v \
         -pfileline=1 \
         -s mips_cpu_bus_tb \
         -P mips_cpu_bus_tb.EXPECTED_VALUE="$expected_value" \

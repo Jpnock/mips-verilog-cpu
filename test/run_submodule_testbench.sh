@@ -21,7 +21,7 @@ for file in $TEST_FILES; do
     printf "$l▶$ll Building Test: $(basename $TB_NAME)\n" $
 
     # Build TB
-    iverilog -DDEBUG -Wall -g 2012 rtl/mips_cpu/*.v rtl/mips_cpu_*.v \
+    iverilog -DDEBUG -Wall -g 2012 rtl/mips_cpu/*.v rtl/mips_cpu_*.v rtl/test/*.v \
         -pfileline=1 \
         -s $TB_NAME \
         -o "$out" 2>&1 | sed 's/^/  /'

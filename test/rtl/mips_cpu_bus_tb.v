@@ -17,17 +17,25 @@ module mips_cpu_bus_tb ();
   parameter RAM_WAIT = 0;
   parameter EXPECTED_VALUE = -1;
 
+  size_t expected_value_reg;
+  assign expected_value_reg = EXPECTED_VALUE;
+
   initial begin
     $dumpfile("mips_cpu_bus_tb.vcd");
     $dumpvars(0, mips_cpu_bus_tb);
 
     clk = 0;
     #1;
-    repeat (512) begin
-      #2 clk = !clk;
+    repeat (256) begin
+      #2;
+      clk = !clk;
     end
-    assert (register_v0 == EXPECTED_VALUE)
-    else $fatal(0, "Testbench failed.");
+
+    assert (active == 0)
+    else $fatal(1, "Testbench did not execute within 256 cycles");
+
+    assert (register_v0 == expected_value_reg)
+    else $fatal(1, "Testbench expected 0x%08x but got 0x%08x", expected_value_reg, register_v0);
     $finish;
   end
 

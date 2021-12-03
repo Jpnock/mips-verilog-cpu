@@ -61,9 +61,22 @@ module mips_cpu_bus (
   // ALU
   size_t mfhi, mflo, alu_out, effective_address;
 
+  logic [1:0] load_store_byte_offset;
+
+  size_t pc_o_1, pc_o_2;
+  always_ff @(posedge clk) begin
+    if (reset) begin
+      pc_o_1 <= 32'hFFFFFFFF;
+      pc_o_2 <= 32'hFFFFFFFF;
+    end else begin
+      pc_o_2 <= pc_o_1;
+      pc_o_1 <= pc_o;
+    end
+  end
+
   //TODO: Add wait request stalls later.
-  assign stall = (read || write) && waitrequest;
-  assign halt  = (pc_o == 0) ? 1 : 0;
+  assign stall = (pc_o == 0) || (read || write) && waitrequest;
+  assign halt  = (pc_o == 0 && pc_o_1 == 0 && pc_o_2 == 0) ? 1 : 0;
   fsm fsm (
       .clk(clk),
       .halt_i(halt),
@@ -88,6 +101,7 @@ module mips_cpu_bus (
       .function_i(funct),
       .regimm_i(regimm),
       .b_cond_met_i(b_cond_met),
+      .load_store_byte_offset_i(load_store_byte_offset),
       .pc_write_en_o(pc_write_en),
       .ir_write_en_o(ir_write_en),
       .ram_write_en_o(write),
@@ -188,6 +202,7 @@ module mips_cpu_bus (
       .target_i(target),
       .pc_i(pc_o),
       .ram_readdata_i(readdata_bigendian),
+      .load_store_byte_offset_o(load_store_byte_offset),
       .rd_o(rd_data_d),
       .rt_o(rt_data_d),
       .effective_address_o(effective_address),
