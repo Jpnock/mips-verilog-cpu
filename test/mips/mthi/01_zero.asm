@@ -3,5 +3,6 @@
 .text
 .globl main
 main:
-    mthi $v0
+    mthi $t1
+    mfhi $v0
     jr $zero

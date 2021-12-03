@@ -4,8 +4,8 @@
 .globl main
 main:
     addiu $t1, $t1, -0xF
-    addiu $v0, $t2, -0x5
-    div $zero, $t1, $v0
+    addiu $t0, $t2, -0x5
+    div $zero, $t1, $t0
     nop
     nop
     mfhi $v0

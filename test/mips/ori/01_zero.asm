@@ -3,5 +3,5 @@
 .text
 .globl main
 main:   
-    ori $v0, $v0, 0x0
+    ori $v0, $t0, 0x0
     jr $zero

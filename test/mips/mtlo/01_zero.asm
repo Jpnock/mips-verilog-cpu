@@ -3,6 +3,7 @@
 .text
 .globl main
 main:
-    mtlo $v0
+    mtlo $t1
+    mflo $v0
     jr $zero
     

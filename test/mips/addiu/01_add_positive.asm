@@ -3,9 +3,9 @@
 .text
 .globl main
 main:
-    addiu $v0, $v0, 0x8     # v0 = 0x8
-    addiu $v0, $v0, 0x3     # v0 = 0xB
-    addiu $v0, $v0, 0x1     # v0 = 0xC
-    addiu $v0, $v0, 0x0     # v0 = 0xC
+    addiu $t0, $t0, 0x8     # t0 = 0x8
+    addiu $t0, $t0, 0x3     # t0 = 0xB
+    addiu $t0, $t0, 0x1     # t0 = 0xC
+    addiu $v0, $t0, 0x0     # t0 = 0xC
     jr $zero
 

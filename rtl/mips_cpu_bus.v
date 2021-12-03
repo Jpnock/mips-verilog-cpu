@@ -5,7 +5,7 @@ module mips_cpu_bus (
     input logic clk,
     input logic reset,
     output logic active,
-    output logic [31:0] register_v0,
+    output logic [31:0] register_t0,
 
     /* Avalon memory mapped bus controller (master) */
     output logic [31:0] address,
@@ -55,7 +55,7 @@ module mips_cpu_bus (
       rt_data_d,
       write_data_3,
       rd_data_d,
-      read_data_reg_v0;
+      read_data_reg_t0;
 
 
   // ALU
@@ -75,7 +75,7 @@ module mips_cpu_bus (
 `ifdef DEBUG
   always_ff @(posedge clk) begin
     if (halt) begin
-      $display("Halt output (active %d): %08h", active, register_v0);
+      $display("Halt output (active %d): %08h", active, register_t0);
     end
   end
 `endif
@@ -171,7 +171,7 @@ module mips_cpu_bus (
       .write_enable_i(regfile_write_en),
       .read_data_1_o(rs_regfile_data),
       .read_data_2_o(rt_regfile_data),
-      .read_data_reg_v0_o(read_data_reg_v0)
+      .read_data_reg_t0_o(read_data_reg_t0)
   );
 
   alu alu (
@@ -197,7 +197,7 @@ module mips_cpu_bus (
 
   /* Other IO/IN. */
   assign active = state != HALT;
-  assign register_v0 = read_data_reg_v0;
+  assign register_t0 = read_data_reg_t0;
   assign address = (ram_addr_sel == 1) ? effective_address : pc_o;
 
   assign writedata = swap_endian(rt_data_d);

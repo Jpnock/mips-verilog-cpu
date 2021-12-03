@@ -3,6 +3,7 @@
 .text
 .globl main
 main:
-    addiu $v0, $v0, 0x5
-    mthi $v0
+    addiu $t1, $t1, 0x5
+    mthi $t1
+    mfhi $v0
     jr $zero

@@ -1,9 +1,9 @@
-# Expect: -0x10000
+# Expect: -65536
 
 .text
 .globl main
 main:
-    addiu $v0, $v0, -0x8000
-    addiu $v0, $v0, -0x8000
+    addiu $t0, $t0, -0x8000
+    addiu $v0, $t0, -0x8000
     jr $zero
 

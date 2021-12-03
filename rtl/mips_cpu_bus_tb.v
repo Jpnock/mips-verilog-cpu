@@ -3,7 +3,7 @@ module mips_cpu_bus_tb ();
   logic clk;
   logic reset;
   logic active;
-  logic [31:0] register_v0;
+  logic [31:0] register_t0;
 
   logic [31:0] address;
   logic write;
@@ -27,7 +27,7 @@ module mips_cpu_bus_tb ();
     repeat (256) begin
       #2 clk = !clk;
     end
-    assert (register_v0 == expected_value_reg)
+    assert (register_t0 == expected_value_reg)
     else $fatal(0, "Testbench failed.");
     $finish;
   end
@@ -51,7 +51,7 @@ module mips_cpu_bus_tb ();
       .clk(clk),
       .reset(reset),
       .active(active),
-      .register_v0(register_v0),
+      .register_t0(register_t0),
       .address(address),
       .write(write),
       .read(read),

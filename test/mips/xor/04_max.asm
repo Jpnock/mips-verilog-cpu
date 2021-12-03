@@ -4,6 +4,6 @@
 .globl main
 main:
     addiu $t1, $t1, 0x7FFF
-    addiu $v0, $v0, 0x7FFF
-    xor $v0, $v0, $t1
+    addiu $t0, $t0, 0x7FFF
+    xor $v0, $t0, $t1
     jr $zero

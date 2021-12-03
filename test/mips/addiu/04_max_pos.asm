@@ -3,6 +3,6 @@
 .text
 .globl main
 main:
-    addiu $v0, $v0, 0x7FFF  # v0 = 0x7FFF
-    addiu $v0, $v0, 0x7FFF  # v0 = 0xFFFE
+    addiu $t0, $t0, 0x7FFF  # t0 = 0x7FFF
+    addiu $v0, $t0, 0x7FFF  # t0 = 0xFFFE
     jr $zero

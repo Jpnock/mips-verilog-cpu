@@ -4,7 +4,7 @@
 .globl main
 main:
     addiu $t1, $t1, 0x5
-    divu $zero, $v0, $t1
+    divu $zero, $t0, $t1
     nop
     nop
     mfhi $v0

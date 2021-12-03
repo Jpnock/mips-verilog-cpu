@@ -1,9 +1,9 @@
-# Expect: -8000
-
+# Expect: -0x8000
 
 .text
 .globl main
 main:
-	addiu $v0, $v0, -8000
-	mtlo $v0
+	addiu $t1, $t1, -0x8000
+	mtlo $t1
+	mflo $v0
 	jr $zero

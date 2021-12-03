@@ -3,6 +3,6 @@
 .text
 .globl main
 main:
-    and $v0, $t1, $t2
-    and $v0, $t1, $v0
+    and $t0, $t1, $t2
+    and $v0, $t1, $t0
     jr $zero
