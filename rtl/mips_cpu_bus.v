@@ -63,9 +63,20 @@ module mips_cpu_bus (
 
   logic [1:0] load_store_byte_offset;
 
+  size_t pc_o_1, pc_o_2;
+  always_ff @(posedge clk) begin
+    if (reset) begin
+      pc_o_1 <= 32'hFFFFFFFF;
+      pc_o_2 <= 32'hFFFFFFFF;
+    end else begin
+      pc_o_2 <= pc_o_1;
+      pc_o_1 <= pc_o;
+    end
+  end
+
   //TODO: Add wait request stalls later.
-  assign stall = 0;
-  assign halt  = (pc_o == 0) ? 1 : 0;
+  assign stall = (pc_o == 0);
+  assign halt  = (pc_o == 0 && pc_o_1 == 0 && pc_o_2 == 0) ? 1 : 0;
   fsm fsm (
       .clk(clk),
       .halt_i(halt),
