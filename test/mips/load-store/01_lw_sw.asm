@@ -1,10 +1,10 @@
-# Expect: 0x468024CD
+# Expect: 0x14589BBA
 
 .text
 .globl main
 main:
     lw $t0, var
-    lw $t1, var2
+    la $t1, var2
     sw $t0, 0($t1)
     lw $v0, 0($t1)
     jr $zero
