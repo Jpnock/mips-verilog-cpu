@@ -75,7 +75,7 @@ module mips_cpu_bus (
   end
 
   //TODO: Add wait request stalls later.
-  assign stall = (pc_o == 0) || (read || write) && waitrequest;
+  assign stall = (pc_o == 0) || ((read || write) && waitrequest);
   assign halt  = (pc_o == 0 && pc_o_1 == 0 && pc_o_2 == 0) ? 1 : 0;
   fsm fsm (
       .clk(clk),
