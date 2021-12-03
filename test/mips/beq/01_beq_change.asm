@@ -1,10 +1,11 @@
-# Expect: 0x0000468A
+# Expect: 0x00002345
 
 .text
 .globl main
 main: 
-    addi	$v0, $v0, var1        
     beq		$v0,  L1
+    addi	$v0, $v0, var1        
+    
 
 L1: 
     addi	$v0, $v0, var1
