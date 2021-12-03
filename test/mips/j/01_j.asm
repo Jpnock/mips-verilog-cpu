@@ -1,7 +1,15 @@
-#expect the address to change to (39192)
+#Expect: 0x0075A91F
 
-j		0x2646				# jump to 0x2646
+.text
+.globl main
+main: 
+    addi    $v0, $v0, var1   
+    j	    L1
+
+L1: 
+    addi    $v0, $v0, var2
 
 
-jr $ra
-sll $zero, $zero, 0
+.data
+var1: .word 0x0075A910
+var2: .word 0x0000000F
