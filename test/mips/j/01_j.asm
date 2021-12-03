@@ -1,4 +1,4 @@
-#Expect: 0x0075A91F
+# Expect: 0x0075A91F
 
 .text
 .globl main

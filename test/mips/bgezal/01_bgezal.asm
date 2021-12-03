@@ -1,4 +1,4 @@
-#Expect: 0x042DCF03
+# Expect: 0x042DCF03
 
 .text
 .globl main

@@ -1,4 +1,4 @@
-#Expect: 0x02352A26
+# Expect: 0x02352A26
 
 .text
 .globl main

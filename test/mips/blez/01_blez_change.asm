@@ -1,4 +1,4 @@
-#Expect: 0x0334AF70
+# Expect: 0x0334AF70
 
 .text
 .globl main
