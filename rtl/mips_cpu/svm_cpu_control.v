@@ -6,6 +6,7 @@ module control (
     input func_t function_i,
     input regimm_t regimm_i,
     input logic b_cond_met_i,
+    input logic [1:0] load_store_byte_offset_i,
     output logic pc_write_en_o,
     output logic ir_write_en_o,
     output logic ram_write_en_o,
@@ -45,15 +46,27 @@ module control (
           ram_write_en_o = 1;
           src_b_sel_o = 1;
           ram_addr_sel_o = 1;
-          ram_byte_en_o = (opcode_i == OP_SW) ? 4'b1111 : (opcode_i == OP_SH ? 4'b1100 : 4'b1000);
+          case (opcode_i)
+            OP_SW: ram_byte_en_o = 4'b1111;
+            OP_SH: ram_byte_en_o = 4'b0011 << load_store_byte_offset_i;
+            OP_SB: ram_byte_en_o = 4'b0001 << load_store_byte_offset_i;
+          endcase
+`ifdef DEBUG
+          $display("store: got offset of %d with byte enable of %04b", load_store_byte_offset_i,
+                   ram_byte_en_o);
+`endif
         end
       end
-      OP_LW, OP_LH, OP_LB: begin
+      OP_LW, OP_LH, OP_LHU, OP_LB, OP_LBU: begin
         if (isStateEXEC1) begin
           ram_read_en_o = 1;
           src_b_sel_o = 1;
           ram_addr_sel_o = 1;
-          ram_byte_en_o = (opcode_i == OP_LW) ? 4'b1111 : (opcode_i == OP_LH ? 4'b1100 : 4'b1000);
+          case (opcode_i)
+            OP_LW: ram_byte_en_o = 4'b1111;
+            OP_LH, OP_LHU: ram_byte_en_o = 4'b0011 << load_store_byte_offset_i;
+            OP_LB, OP_LBU: ram_byte_en_o = 4'b0001 << load_store_byte_offset_i;
+          endcase
         end
         regfile_write_en_o |= isStateEXEC2;
       end
