@@ -46,6 +46,12 @@ module alu (
     end
   endfunction
 
+  function automatic size_t signextend8to32(input [7:0] x);
+    begin
+      return x[7] == 1 ? {24'hFFFFFF, x} : {24'b0, x};
+    end
+  endfunction
+
   size_t sign_extended_imm;
   size_t zero_extended_imm;
 
@@ -68,6 +74,13 @@ module alu (
 
   logic [27:0] word_target_i;
   assign word_target_i = {target_i, 2'b00};
+
+  logic [7:0]
+      ram_readdata_offset_0, ram_readdata_offset_1, ram_readdata_offset_2, ram_readdata_offset_3;
+  assign ram_readdata_offset_0 = ram_readdata_i[31:24];
+  assign ram_readdata_offset_1 = ram_readdata_i[23:16];
+  assign ram_readdata_offset_2 = ram_readdata_i[15:8];
+  assign ram_readdata_offset_3 = ram_readdata_i[7:0];
 
   size_t sign_extended_imm_plus_offset;
   assign sign_extended_imm_plus_offset = sign_extended_imm + rs_i;
@@ -166,28 +179,66 @@ module alu (
       // to each load and store instruction, since the branch instruction also uses it. 
       // Perhaps they should use different wires?
       OP_LW: begin
-        effective_address_o = sign_extended_imm + rs_i;
+        effective_address_o = sign_extended_imm_plus_offset & 32'hFFFFFFFC;
         rt_o = ram_readdata_i;
       end
       OP_LH: begin
-        effective_address_o = sign_extended_imm + rs_i;
-        rt_o = ram_readdata_i >> 16;
+        effective_address_o = sign_extended_imm_plus_offset & 32'hFFFFFFFC;
+        case (load_store_byte_offset_o)
+          0: rt_o = signextend16to32({ram_readdata_offset_0, ram_readdata_offset_1});
+          default: rt_o = signextend16to32({ram_readdata_offset_2, ram_readdata_offset_3});
+        endcase
+`ifdef DEBUG
+        $display("LH: got 0x%08x (orignally 0x%08x) with offset %d", rt_o, ram_readdata_i,
+                 load_store_byte_offset_o);
+`endif
+      end
+      OP_LHU: begin
+        effective_address_o = sign_extended_imm_plus_offset & 32'hFFFFFFFC;
+        case (load_store_byte_offset_o)
+          0: rt_o = zeroextend16to32({ram_readdata_offset_0, ram_readdata_offset_1});
+          default: rt_o = zeroextend16to32({ram_readdata_offset_2, ram_readdata_offset_3});
+        endcase
       end
       OP_LB: begin
-        effective_address_o = sign_extended_imm + rs_i;
-        rt_o = ram_readdata_i >> 24;
+        effective_address_o = sign_extended_imm_plus_offset & 32'hFFFFFFFC;
+        //rt_o = (ram_readdata_i & (32'hFF000000 >> load_store_bit_offset)) >> (24 - load_store_bit_offset);
+        case (load_store_byte_offset_o)
+          0: rt_o = signextend8to32(ram_readdata_offset_0);
+          1: rt_o = signextend8to32(ram_readdata_offset_1);
+          2: rt_o = signextend8to32(ram_readdata_offset_2);
+          default: rt_o = signextend8to32(ram_readdata_offset_3);
+        endcase
+`ifdef DEBUG
+        $display("got data from ram 0x%08x @ 0x%08x, loading byte 0x%08x with offset %d",
+                 ram_readdata_i, effective_address_o, rt_o, load_store_byte_offset_o);
+`endif
+      end
+      OP_LBU: begin
+        effective_address_o = sign_extended_imm_plus_offset & 32'hFFFFFFFC;
+        case (load_store_byte_offset_o)
+          0: rt_o = {24'b0, ram_readdata_offset_0};
+          1: rt_o = {24'b0, ram_readdata_offset_1};
+          2: rt_o = {24'b0, ram_readdata_offset_2};
+          default: rt_o = {24'b0, ram_readdata_offset_3};
+        endcase
       end
       OP_SW: begin
-        effective_address_o = sign_extended_imm + rs_i;
+        effective_address_o = sign_extended_imm_plus_offset;
         rt_o = rt_i;
       end
       OP_SH: begin
-        effective_address_o = sign_extended_imm + rs_i;
-        rt_o = rt_i << 16;
+        effective_address_o = sign_extended_imm_plus_offset & 32'hFFFFFFFC;
+        rt_o = (load_store_byte_offset_o == 0) ? (rt_i << 16) : (rt_i & 32'h0000FFFF);
       end
       OP_SB: begin
-        effective_address_o = sign_extended_imm + rs_i;
-        rt_o = rt_i << 24;
+        effective_address_o = sign_extended_imm_plus_offset & 32'hFFFFFFFC;
+        case (load_store_byte_offset_o)
+          0: rt_o = (rt_i << 24) & 32'hFF000000;
+          1: rt_o = (rt_i << 16) & 32'h00FF0000;
+          2: rt_o = (rt_i << 8) & 32'h0000FF00;
+          default: rt_o = rt_i & 32'h000000FF;
+        endcase
       end
       // TODO: we need to be careful here if we're doing non 32-bit store
       // operations (e.g. SH, SB). The representation of bytes or half-words
