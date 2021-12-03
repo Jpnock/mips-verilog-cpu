@@ -18,6 +18,8 @@ module alu (
 
     input size_t ram_readdata_i,
 
+    output logic [1:0] load_store_byte_offset_o,
+
     output size_t rd_o,
     output size_t rt_o,
     output size_t effective_address_o,
@@ -66,6 +68,11 @@ module alu (
 
   logic [27:0] word_target_i;
   assign word_target_i = {target_i, 2'b00};
+
+  size_t sign_extended_imm_plus_offset;
+  assign sign_extended_imm_plus_offset = sign_extended_imm + rs_i;
+
+  assign load_store_byte_offset_o = sign_extended_imm_plus_offset % 4;
 
   always_comb begin
     case (opcode_i)

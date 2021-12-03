@@ -61,6 +61,8 @@ module mips_cpu_bus (
   // ALU
   size_t mfhi, mflo, alu_out, effective_address;
 
+  logic [1:0] load_store_byte_offset;
+
   //TODO: Add wait request stalls later.
   assign stall = 0;
   assign halt  = (pc_o == 0) ? 1 : 0;
@@ -86,6 +88,7 @@ module mips_cpu_bus (
       .function_i(funct),
       .regimm_i(regimm),
       .b_cond_met_i(b_cond_met),
+      .load_store_byte_offset_i(load_store_byte_offset),
       .pc_write_en_o(pc_write_en),
       .ir_write_en_o(ir_write_en),
       .ram_write_en_o(write),
@@ -187,6 +190,7 @@ module mips_cpu_bus (
       .target_i(target),
       .pc_i(pc_o),
       .ram_readdata_i(readdata_bigendian),
+      .load_store_byte_offset_o(load_store_byte_offset),
       .rd_o(rd_data_d),
       .rt_o(rt_data_d),
       .effective_address_o(effective_address),
