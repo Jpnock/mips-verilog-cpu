@@ -11,7 +11,7 @@ main:
     lw $t3, var1            # t3   = 0x20A121A2
     addu $t3, $t3, $t2      # t3   = 0x20A121A1
     addiu $t3, $t3, 1       # t3   = 0x20A121A2
-    addu $v0, $t3, $t3      # v0   = 0x41424344
+    addu $v0, $t3, $t3      # t0   = 0x41424344
     jr $zero
 
 .data

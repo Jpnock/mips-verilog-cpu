@@ -14,6 +14,7 @@ module mips_cpu_bus_tb ();
   logic [31:0] readdata;
 
   parameter RAM_FILE = "";
+  parameter RAM_WAIT = 0;
   parameter EXPECTED_VALUE = -1;
 
   size_t expected_value_reg;
@@ -68,9 +69,11 @@ module mips_cpu_bus_tb ();
   );
 
   cpu_ram #(
-      .RAM_FILE(RAM_FILE)
+      .RAM_FILE(RAM_FILE),
+      .RAM_WAIT(RAM_WAIT)
   ) cpu_ram (
       .clk(clk),
+      .reset(reset),
       .read(read),
       .write(write),
       .byteenable(byteenable),
