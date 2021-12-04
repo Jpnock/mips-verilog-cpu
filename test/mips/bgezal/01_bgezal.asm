@@ -1,4 +1,4 @@
-# Expect: 0x042DCF03
+# Expect: 0x0000CF03
 
 .text
 .globl main
@@ -18,6 +18,6 @@ L1:
 
 .data
 var1: .word 0x00002351
-var2: .word 0x0000000F
-var3: .word 0x04056400
-var4: .word 0x002847A3
+var2: .word 0x000F
+var3: .word 0x6400
+var4: .word 0x47A3

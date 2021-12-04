@@ -9,7 +9,7 @@ main:
 L1: 
     lw      $v0, var2
     bltz	$v0, L2
-    subi	$v0, $v0, var3
+    lw      $v0, var3
     bltz   	$v0, L2
     lw      $v0, var4
     jr		$zero	
@@ -22,5 +22,5 @@ L2:
 .data
 var1: .word 0xF0003452
 var2: .word 0x00000000
-var3: .word 0x0F000000
+var3: .word 0xFF000000
 var4: .word 0x35829502

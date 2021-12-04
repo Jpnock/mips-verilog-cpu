@@ -10,7 +10,7 @@ main:
 L1: 
     lw      $v0, var2
     bgtz	$v0, L2
-    subi	$v0, $v0, var3
+    lw	    $v0, var3
     bgtz   	$v0, L2
     lw      $v0, var4
     jr		$zero	

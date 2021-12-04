@@ -17,4 +17,4 @@ L1:
     jr		$zero	
 .data
 
-var1: .word 0x00002345
+var1: .word 0x2345

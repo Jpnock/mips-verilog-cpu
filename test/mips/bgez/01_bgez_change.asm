@@ -19,5 +19,5 @@ L2:
 
 .data
 var1: .word 0x00000000
-var2: .word 0x0000000F
+var2: .word 0x000F
 var3: .word 0xF0000000
