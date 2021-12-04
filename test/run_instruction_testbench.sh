@@ -27,7 +27,7 @@ for file in $TEST_FILES; do
         EXIT_CODE=1
     }
 
-    # Extract Expected Value
+    # Extract Expect Value
     expected_value=$(head -n 1 "$file" | sed -n -e 's/^# Expect: //p')
     if [[ -z $expected_value ]]; then
         fail_file
@@ -56,7 +56,6 @@ for file in $TEST_FILES; do
     fi
 
     # Error
-    # TODO: maybe remove this before submission?
     grep -q -i -v "^ERROR:" "${testlog}" >/dev/null 2>&1
     if [[ $? -ne 0 ]]; then
         fail_file

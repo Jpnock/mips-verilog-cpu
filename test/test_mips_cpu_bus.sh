@@ -1,4 +1,3 @@
-# TODO: Remove TEST_WAIT before submission.
 set -euo pipefail
 
 SOURCE_DIR=${1:-rtl}

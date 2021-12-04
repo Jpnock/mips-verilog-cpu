@@ -56,7 +56,6 @@ module mips_cpu_bus (
       rd_data_d,
       read_data_reg_v0;
 
-
   // ALU
   size_t mfhi, mflo, alu_out, effective_address;
 
