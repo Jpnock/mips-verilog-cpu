@@ -2,6 +2,7 @@ import codes::*;
 
 module cpu_ram (
     input logic clk,
+    input logic reset,
     input logic read,
     input logic write,
     input logic [3:0] byteenable,
@@ -32,6 +33,9 @@ module cpu_ram (
   size_t mapped_address;
   assign mapped_address = (address - RAM_OFFSET);
 
+  logic ram_wait;
+  assign ram_wait = RAM_WAIT;
+
 
   // This is little endian ordering as the lowest byte in memory is the least significant.
   logic [7:0] read_3, read_2, read_1, read_0;
@@ -47,7 +51,7 @@ module cpu_ram (
   assign write_3 = (byteenable[3] == 1) ? writedata[31:24] : read_3;
 
   always_ff @(posedge clk) begin
-    if (RAM_WAIT) begin
+    if (ram_wait == 1) begin
       waitrequest <= $urandom_range(0, 1);
     end else begin
       waitrequest <= 0;
@@ -59,12 +63,24 @@ module cpu_ram (
       readdata <= 32'hxxxxxxxx;
     end else begin
       if (write) begin
+`ifdef DEBUG
+        $display("write got: 0x%08x @ %08x", {
+                 byteenable[0] ? writedata[7:0] : read_0,
+                 byteenable[1] ? writedata[15:8] : read_1,
+                 byteenable[2] ? writedata[23:16] : read_2,
+                 byteenable[3] ? writedata[31:24] : read_3
+                 }, address);
+`endif
         ram[mapped_address]   <= write_0;
         ram[mapped_address+1] <= write_1;
         ram[mapped_address+2] <= write_2;
         ram[mapped_address+3] <= write_3;
+      end else if (read) begin
+`ifdef DEBUG
+        $display("read @ 0x%08x, got 0x%08x", address, {read_0, read_1, read_2, read_3});
+`endif
+        readdata <= {read_3, read_2, read_1, read_0};
       end
-      readdata <= {read_3, read_2, read_1, read_0};
     end
   end
 

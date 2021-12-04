@@ -73,6 +73,7 @@ module mips_cpu_bus_tb ();
       .RAM_WAIT(RAM_WAIT)
   ) cpu_ram (
       .clk(clk),
+      .reset(reset),
       .read(read),
       .write(write),
       .byteenable(byteenable),
