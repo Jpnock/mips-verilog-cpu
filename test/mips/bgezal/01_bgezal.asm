@@ -6,11 +6,13 @@ main:
     lw      $v0, var1   
     bgezal	$v0, L1
     addi    $v0, $v0, var4
+    jr		$zero	
 
 
 L1: 
     addi    $v0, $v0, var2
     addi    $v0, $v0, var3
+    jr		$zero	
     
 
 
