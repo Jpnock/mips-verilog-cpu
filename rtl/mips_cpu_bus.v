@@ -26,11 +26,10 @@ module mips_cpu_bus (
 
   // FSM
   logic stall, halt;
-  state_t state;
+  state_t  state;
 
   // Control
-  full_op_t full_op;
-  func_t funct;
+  func_t   funct;
   opcode_t opcode;
   regimm_t regimm;
   logic pc_write_en, ir_write_en, regfile_write_en, src_b_sel, ram_addr_sel;
@@ -61,9 +60,22 @@ module mips_cpu_bus (
   // ALU
   size_t mfhi, mflo, alu_out, effective_address;
 
+  logic [1:0] load_store_byte_offset;
+
+  size_t pc_o_1, pc_o_2;
+  always_ff @(posedge clk) begin
+    if (reset) begin
+      pc_o_1 <= 32'hFFFFFFFF;
+      pc_o_2 <= 32'hFFFFFFFF;
+    end else begin
+      pc_o_2 <= pc_o_1;
+      pc_o_1 <= pc_o;
+    end
+  end
+
   //TODO: Add wait request stalls later.
-  assign stall = 0;
-  assign halt  = (pc_o == 0) ? 1 : 0;
+  assign stall = (pc_o == 0) || ((read || write) && waitrequest);
+  assign halt  = (pc_o == 0 && pc_o_1 == 0 && pc_o_2 == 0) ? 1 : 0;
   fsm fsm (
       .clk(clk),
       .halt_i(halt),
@@ -76,20 +88,29 @@ module mips_cpu_bus (
   always_ff @(posedge clk) begin
     if (halt) begin
       $display("Halt output (active %d): %08h", active, register_v0);
+    end else begin
+      $display("In state %d (active %d) - stall=%d", state, active, stall);
     end
   end
 `endif
 
+  logic ram_read_en, ram_write_en;
+  assign read  = ram_read_en & (pc_o != 0);
+  assign write = ram_write_en & (pc_o != 0);
+
   control control (
+      .clk(clk),
+      .stall_i(stall),
       .state_i(state),
       .opcode_i(opcode),
       .function_i(funct),
       .regimm_i(regimm),
       .b_cond_met_i(b_cond_met),
+      .load_store_byte_offset_i(load_store_byte_offset),
       .pc_write_en_o(pc_write_en),
       .ir_write_en_o(ir_write_en),
-      .ram_write_en_o(write),
-      .ram_read_en_o(read),
+      .ram_write_en_o(ram_write_en),
+      .ram_read_en_o(ram_read_en),
       .ram_byte_en_o(byteenable),
       .ram_addr_sel_o(ram_addr_sel),
       .src_b_sel_o(src_b_sel),
@@ -110,11 +131,9 @@ module mips_cpu_bus (
 
   ir ir (
       .clk(clk),
-      .state_i(state),
       .wen_i(ir_write_en),
       .reset_i(reset),
       .instr_i(readdata_bigendian),
-      .full_op_o(full_op),
       .opcode_o(opcode),
       .funct_o(funct),
       .regimm_o(regimm),
@@ -176,7 +195,6 @@ module mips_cpu_bus (
 
   alu alu (
       .clk(clk),
-      .full_op_i(full_op),
       .reset_i(reset),
       .opcode_i(opcode),
       .funct_i(funct),
@@ -187,6 +205,7 @@ module mips_cpu_bus (
       .target_i(target),
       .pc_i(pc_o),
       .ram_readdata_i(readdata_bigendian),
+      .load_store_byte_offset_o(load_store_byte_offset),
       .rd_o(rd_data_d),
       .rt_o(rt_data_d),
       .effective_address_o(effective_address),
