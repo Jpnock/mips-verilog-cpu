@@ -88,6 +88,8 @@ module mips_cpu_bus (
   always_ff @(posedge clk) begin
     if (halt) begin
       $display("Halt output (active %d): %08h", active, register_v0);
+    end else begin
+      $display("In state %d (active %d) - stall=%d", state, active, stall);
     end
   end
 `endif
