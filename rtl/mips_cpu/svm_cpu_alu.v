@@ -74,6 +74,9 @@ module alu (
   logic [27:0] word_target_i;
   assign word_target_i = {target_i, 2'b00};
 
+  logic [4:0] load_store_bit_offset;
+  assign load_store_bit_offset = {load_store_byte_offset_o, 3'b000};
+
   logic [7:0]
       ram_readdata_offset_0, ram_readdata_offset_1, ram_readdata_offset_2, ram_readdata_offset_3;
   assign ram_readdata_offset_0 = ram_readdata_i[31:24];
@@ -174,9 +177,14 @@ module alu (
       OP_XORI:  rt_o = rs_i ^ zero_extended_imm;
       // TODO: LUI mentions something about sign extension but that doesn't make sense in this context.
       OP_LUI:   rt_o = {immediate_i, 16'b0};
-      // TODO: For to fix some build errors I just moved the effective_address assignment here
-      // to each load and store instruction, since the branch instruction also uses it. 
-      // Perhaps they should use different wires?
+      OP_LWL: begin
+        effective_address_o = sign_extended_imm_plus_offset & 32'hFFFFFFFC;
+        rt_o = (ram_readdata_i << load_store_bit_offset) | (rt_i & (32'hFFFFFFFF >> (32-load_store_bit_offset)));
+      end
+      OP_LWR: begin
+        effective_address_o = sign_extended_imm_plus_offset & 32'hFFFFFFFC;
+        rt_o = (ram_readdata_i >> (24 - load_store_bit_offset)) | (rt_i & (32'hFFFFFF00 << load_store_bit_offset));
+      end
       OP_LW: begin
         effective_address_o = sign_extended_imm_plus_offset & 32'hFFFFFFFC;
         rt_o = ram_readdata_i;
