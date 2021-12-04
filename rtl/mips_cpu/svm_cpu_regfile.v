@@ -10,7 +10,7 @@ module regfile (
     input logic write_enable_i,
     output size_t read_data_1_o,
     output size_t read_data_2_o,
-    output size_t read_data_reg_t0_o
+    output size_t read_data_reg_v0_o
 );
 
   // 32 times 32-bit registers
@@ -18,7 +18,7 @@ module regfile (
 
   assign read_data_1_o = regs[addr_1_i];
   assign read_data_2_o = regs[addr_2_i];
-  assign read_data_reg_t0_o = regs[2];
+  assign read_data_reg_v0_o = regs[2];
 
   always_ff @(posedge clk) begin
     if (reset_i == 1) begin
