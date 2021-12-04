@@ -1,15 +1,12 @@
-# Expect: 0x0075A91F
+# Expect: 0xFFFFA91F
 
 .text
 .globl main
 main: 
-    addi    $v0, $v0, var1   
+    addi    $v0, $v0, 0xA910   
     j	    L1
+    jr      $zero
 
 L1: 
-    addi    $v0, $v0, var2
-
-
-.data
-var1: .word 0x0075A910
-var2: .word 0x0000000F
+    addi    $v0, $v0, 0x0000F
+    jr      $zero
