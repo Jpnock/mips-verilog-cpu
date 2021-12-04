@@ -26,11 +26,10 @@ module mips_cpu_bus (
 
   // FSM
   logic stall, halt;
-  state_t state;
+  state_t  state;
 
   // Control
-  full_op_t full_op;
-  func_t funct;
+  func_t   funct;
   opcode_t opcode;
   regimm_t regimm;
   logic pc_write_en, ir_write_en, regfile_write_en, src_b_sel, ram_addr_sel;
@@ -129,7 +128,6 @@ module mips_cpu_bus (
       .wen_i(ir_write_en),
       .reset_i(reset),
       .instr_i(readdata_bigendian),
-      .full_op_o(full_op),
       .opcode_o(opcode),
       .funct_o(funct),
       .regimm_o(regimm),
@@ -191,7 +189,6 @@ module mips_cpu_bus (
 
   alu alu (
       .clk(clk),
-      .full_op_i(full_op),
       .reset_i(reset),
       .opcode_i(opcode),
       .funct_i(funct),

@@ -4,9 +4,8 @@ module alu (
     input logic clk,
     input logic reset_i,
 
-    input full_op_t full_op_i,
     input opcode_t opcode_i,
-    input func_t funct_i,
+    input func_t   funct_i,
     input regimm_t regimm_i,
 
     input size_t rs_i,
