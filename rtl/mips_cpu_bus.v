@@ -92,6 +92,10 @@ module mips_cpu_bus (
   end
 `endif
 
+  logic ram_read_en, ram_write_en;
+  assign read  = ram_read_en & (pc_o != 0);
+  assign write = ram_write_en & (pc_o != 0);
+
   control control (
       .clk(clk),
       .stall_i(stall),
@@ -103,8 +107,8 @@ module mips_cpu_bus (
       .load_store_byte_offset_i(load_store_byte_offset),
       .pc_write_en_o(pc_write_en),
       .ir_write_en_o(ir_write_en),
-      .ram_write_en_o(write),
-      .ram_read_en_o(read),
+      .ram_write_en_o(ram_write_en),
+      .ram_read_en_o(ram_read_en),
       .ram_byte_en_o(byteenable),
       .ram_addr_sel_o(ram_addr_sel),
       .src_b_sel_o(src_b_sel),
