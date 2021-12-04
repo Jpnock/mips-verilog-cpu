@@ -1,6 +1,8 @@
 import codes::*;
 
 module control (
+    input logic clk,
+    input logic stall_i,
     input state_t state_i,
     input opcode_t opcode_i,
     input func_t function_i,
@@ -18,8 +20,7 @@ module control (
     output regfile_addr_sel_t regfile_addr_3_sel_o
 );
 
-  // TODO: Add logic for more instructions.
-
+  // State logic.
   logic isStateFETCH;
   logic isStateEXEC1;
   logic isStateEXEC2;
@@ -28,10 +29,22 @@ module control (
   assign isStateEXEC1 = (state_i == EXEC1);
   assign isStateEXEC2 = (state_i == EXEC2);
 
+  // Valid readdata logic.
+  logic stall_i_delayed;
+  logic ram_read_en_o_delayed;
+  logic ram_readdata_valid;
+
+  always_ff @(posedge clk) begin
+    stall_i_delayed <= stall_i;
+    ram_read_en_o_delayed <= ram_read_en_o;
+  end
+
+  assign ram_readdata_valid = (~stall_i_delayed & ram_read_en_o_delayed);
+
   always_comb begin
     // Defaults
-    pc_write_en_o = isStateEXEC2;
-    ir_write_en_o = isStateEXEC1;
+    pc_write_en_o = isStateEXEC2 & ~stall_i;
+    ir_write_en_o = isStateEXEC1 & ram_readdata_valid;
     ram_write_en_o = 0;
     ram_read_en_o = isStateFETCH;
     ram_byte_en_o = (state_i == FETCH) ? 4'b1111 : 0;
@@ -77,9 +90,9 @@ module control (
       OP_SPECIAL: begin
         case (function_i)
           FUNC_SLL, FUNC_SRL, FUNC_SRA, FUNC_SLLV, FUNC_SRLV, FUNC_SRAV, 
-          FUNC_MFHI, FUNC_MFLO,
-          FUNC_ADD, FUNC_ADDU, FUNC_SUB, FUNC_SUBU, FUNC_AND, FUNC_OR, FUNC_XOR, FUNC_NOR,
-          FUNC_SLT, FUNC_SLTU: begin
+            FUNC_MFHI, FUNC_MFLO,
+            FUNC_ADD, FUNC_ADDU, FUNC_SUB, FUNC_SUBU, FUNC_AND, FUNC_OR, FUNC_XOR, FUNC_NOR,
+            FUNC_SLT, FUNC_SLTU: begin
             if (isStateEXEC2) begin
               regfile_write_en_o   = 1;
               regfile_addr_3_sel_o = REGFILE_ADDR_SEL_RD;
@@ -119,3 +132,4 @@ module control (
 
   end
 endmodule
+

@@ -14,6 +14,7 @@ module cpu_ram (
   // RAM_SIZE is the size of the RAM, offset from the reset vector
   // RAM_FILE is the name of the file which the RAM will be initialised
   parameter RAM_FILE = "";
+  parameter RAM_WAIT = 0;
   parameter RAM_OFFSET = 32'hBFC00000;
   parameter RAM_BYTES = 1024;
 
@@ -26,7 +27,6 @@ module cpu_ram (
     for (integer i = 0; i < 10; i++) begin
       $display("%b", ram[i]);
     end
-
   end
 
   size_t mapped_address;
@@ -47,16 +47,25 @@ module cpu_ram (
   assign write_3 = (byteenable[3] == 1) ? writedata[31:24] : read_3;
 
   always_ff @(posedge clk) begin
-    if (write) begin
-      ram[mapped_address]   <= write_0;
-      ram[mapped_address+1] <= write_1;
-      ram[mapped_address+2] <= write_2;
-      ram[mapped_address+3] <= write_3;
+    if (RAM_WAIT) begin
+      waitrequest <= $urandom_range(0, 1);
+    end else begin
+      waitrequest <= 0;
     end
-    readdata <= {read_3, read_2, read_1, read_0};
   end
 
-  // TODO: we're ignoring the Avalon timing spec here
-  assign waitrequest = 0;
+  always_ff @(posedge clk) begin
+    if (waitrequest) begin
+      readdata <= 32'hxxxxxxxx;
+    end else begin
+      if (write) begin
+        ram[mapped_address]   <= write_0;
+        ram[mapped_address+1] <= write_1;
+        ram[mapped_address+2] <= write_2;
+        ram[mapped_address+3] <= write_3;
+      end
+      readdata <= {read_3, read_2, read_1, read_0};
+    end
+  end
 
 endmodule

@@ -1,9 +1,11 @@
 # TODO: Remove debug outputs.
+# TODO: Remove TEST_WAIT input before submission?
 
 set -uo pipefail
 
 SOURCE_DIR=${1:-rtl}
 TEST_INSTR=${2-}
+TEST_WAIT=${3:-1}
 TEST_FILES=$([[ -z "$TEST_INSTR" ]] && echo "test/mips/**/*.asm" || echo "test/mips/${TEST_INSTR}/*.asm")
 
 EXIT_CODE=0
@@ -39,14 +41,15 @@ for file in $TEST_FILES; do
         -s mips_cpu_bus_tb \
         -P mips_cpu_bus_tb.EXPECTED_VALUE="$expected_value" \
         -P mips_cpu_bus_tb.RAM_FILE=\"${file}.hex\" \
-        -o "$out" > "${buildlog}" 2>&1
+        -P mips_cpu_bus_tb.RAM_WAIT="$TEST_WAIT" \
+        -o "$out" >"${buildlog}" 2>&1
     if [[ $? -ne 0 ]]; then
         fail_file
         continue
     fi
 
     # Run
-    timeout 15s ./$out > "${testlog}" 2>&1
+    timeout 15s ./$out >"${testlog}" 2>&1
     if [[ $? -ne 0 ]]; then
         fail_file
         continue
@@ -54,7 +57,7 @@ for file in $TEST_FILES; do
 
     # Error
     # TODO: maybe remove this before submission?
-    grep -q -i -v "^ERROR:" "${testlog}" > /dev/null 2>&1
+    grep -q -i -v "^ERROR:" "${testlog}" >/dev/null 2>&1
     if [[ $? -ne 0 ]]; then
         fail_file
         continue

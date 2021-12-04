@@ -30,7 +30,6 @@ test:
 	@printf "\n\033[34;1m▶\033[0m Running ASM testbenches\n\n"
 	@./test/test_mips_cpu_bus.sh rtl
 	@printf "\n\033[34;1m ...\033[0m ASM testbenches passed\n"
-
 run:
 	@printf "\033[34;1m▶\033[0m Running ./bin/mips_cpu.out\n"
 	@./bin/mips_cpu.out > ./bin/mips_cpu.log || (cat ./bin/mips_cpu.log; exit 1;)
