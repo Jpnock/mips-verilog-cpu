@@ -23,14 +23,14 @@ for file in $TEST_FILES; do
     testlog="./test/bin/${unique_name}.test.log"
 
     fail_file() {
-        echo "${unique_name} ${dir_name} Fail"
+        echo "${unique_name} ${dir_name} Fail # $1"
         EXIT_CODE=1
     }
 
     # Extract Expect Value
     expected_value=$(head -n 1 "$file" | sed -n -e 's/^# Expect: //p')
     if [[ -z $expected_value ]]; then
-        fail_file
+        fail_file "Did not find expected value in test case"
         continue
     fi
 
@@ -44,21 +44,22 @@ for file in $TEST_FILES; do
         -P mips_cpu_bus_tb.RAM_WAIT="$TEST_WAIT" \
         -o "$out" >"${buildlog}" 2>&1
     if [[ $? -ne 0 ]]; then
-        fail_file
+        fail_file "Failed to build test bench"
         continue
     fi
 
     # Run
     timeout 15s ./$out >"${testlog}" 2>&1
     if [[ $? -ne 0 ]]; then
-        fail_file
+        got_value=$(grep -i -m 1 "Testbench expected 0x" "${testlog}" | tr -d '\n')
+        fail_file "Test bench exited with non-zero status code: ${got_value}"
         continue
     fi
 
     # Error
     grep -q -i -v "^ERROR:" "${testlog}" >/dev/null 2>&1
     if [[ $? -ne 0 ]]; then
-        fail_file
+        fail_file "Test bench found 'ERROR:' within log output"
         continue
     fi
 
