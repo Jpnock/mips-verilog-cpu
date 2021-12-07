@@ -99,8 +99,8 @@ module control (
             OP_LW: tmp_ram_byte_en_o = 4'b1111;
             OP_LH, OP_LHU: tmp_ram_byte_en_o = 4'b0011 << load_store_byte_offset_i;
             OP_LB, OP_LBU: tmp_ram_byte_en_o = 4'b0001 << load_store_byte_offset_i;
-            OP_LWL: tmp_ram_byte_en_o = 4'b1111;  // TODO: do the read enables on this
-            OP_LWR: tmp_ram_byte_en_o = 4'b1111;  // TODO: do the read enables on this
+            OP_LWL: tmp_ram_byte_en_o = 4'b1111 << load_store_byte_offset_i;
+            OP_LWR: tmp_ram_byte_en_o = 4'b1111 >> (3 - load_store_byte_offset_i);
           endcase
         end
         tmp_regfile_write_en_o = isStateEXEC2 | default_regfile_write_en_o;
