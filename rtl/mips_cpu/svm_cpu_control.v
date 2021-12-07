@@ -90,7 +90,7 @@ module control (
 `endif
         end
       end
-      OP_LW, OP_LH, OP_LHU, OP_LB, OP_LBU: begin
+      OP_LW, OP_LH, OP_LHU, OP_LB, OP_LBU, OP_LWL, OP_LWR: begin
         if (isStateEXEC1) begin
           tmp_ram_read_en_o = 1;
           tmp_src_b_sel_o = 1;
@@ -99,6 +99,8 @@ module control (
             OP_LW: tmp_ram_byte_en_o = 4'b1111;
             OP_LH, OP_LHU: tmp_ram_byte_en_o = 4'b0011 << load_store_byte_offset_i;
             OP_LB, OP_LBU: tmp_ram_byte_en_o = 4'b0001 << load_store_byte_offset_i;
+            OP_LWL: tmp_ram_byte_en_o = 4'b1111;  // TODO: do the read enables on this
+            OP_LWR: tmp_ram_byte_en_o = 4'b1111;  // TODO: do the read enables on this
           endcase
         end
         tmp_regfile_write_en_o = isStateEXEC2 | default_regfile_write_en_o;
