@@ -114,16 +114,9 @@ module control (
           FUNC_SLL, FUNC_SRL, FUNC_SRA, FUNC_SLLV, FUNC_SRLV, FUNC_SRAV, 
             FUNC_MFHI, FUNC_MFLO,
             FUNC_ADD, FUNC_ADDU, FUNC_SUB, FUNC_SUBU, FUNC_AND, FUNC_OR, FUNC_XOR, FUNC_NOR,
-            FUNC_SLT, FUNC_SLTU: begin
+            FUNC_SLT, FUNC_SLTU, FUNC_JALR: begin
             if (isStateEXEC2) begin
               tmp_regfile_write_en_o   = 1;
-              tmp_regfile_addr_3_sel_o = REGFILE_ADDR_SEL_RD;
-            end
-          end
-
-          FUNC_JALR: begin
-            if (isStateEXEC2) begin
-              tmp_regfile_write_en_o   = b_cond_met_i;
               tmp_regfile_addr_3_sel_o = REGFILE_ADDR_SEL_RD;
             end
           end
@@ -134,7 +127,7 @@ module control (
       end
       OP_JAL: begin
         if (isStateEXEC2) begin
-          tmp_regfile_write_en_o   = b_cond_met_i;
+          tmp_regfile_write_en_o   = 1;
           tmp_regfile_addr_3_sel_o = REGFILE_ADDR_SEL_GPR31;
         end
       end
