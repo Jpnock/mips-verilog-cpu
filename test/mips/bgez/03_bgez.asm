@@ -1,4 +1,4 @@
-# Expect: 0xxxxxxxxx
+# Expect: 0xFE
 
 .text
 .globl main
@@ -8,7 +8,7 @@ main:
     jr		$zero	
 
 L1: 
-    lw      $v0, -0x009785FC
+    lw      $v0, -0x1
     bgez	$v0, L2
     addi    $v0, $v0, 0x00FF
     jr		$zero	
