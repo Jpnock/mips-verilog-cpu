@@ -1,4 +1,4 @@
-# Expect: 0xC
+# Expect: 0x0
 
 .text
 .globl main
