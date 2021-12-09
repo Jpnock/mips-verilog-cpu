@@ -1,5 +1,7 @@
 # Expect: 0x00000000
 
+# Test: Ensures rt = 0 when $signed(rs) > $signed(imm); imm is assumed to be sign extended.
+
 .text
 .globl main
 main: 

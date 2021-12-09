@@ -1,5 +1,7 @@
 # Expect: 0x00000000
 
+# Test: Ensures rd = 0 when rs = imm; imm is assumed to be sign extended.
+
 .text
 .globl main
 main:
