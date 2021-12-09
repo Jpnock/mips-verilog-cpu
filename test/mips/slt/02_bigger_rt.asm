@@ -1,5 +1,7 @@
 # Expect: 0x00000001
 
+# Test: Ensures rd = 1 when rs < rt. Only works if rs and rt are signed.
+
 .text
 .globl main
 main:
