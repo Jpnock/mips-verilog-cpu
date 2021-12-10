@@ -1,9 +1,0 @@
-# Expect: -1
-
-.text
-.globl main
-main:
-    addiu $t1, $t1, -1      # t1 = -1 
-    addu $v0, $v0, $v0      # v0 = 0x0
-    addu $v0, $t1, $v0      # v0 = -1
-    jr $ze
