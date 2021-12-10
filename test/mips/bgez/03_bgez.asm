@@ -3,7 +3,7 @@
 .text
 .globl main
 main: 
-    la      $v0, var1   
+    lw      $v0, var1   
     bgez	$v0, L1
     jr		$zero	
 
@@ -14,7 +14,7 @@ L1:
     jr		$zero	
 
 L2: 
-    la      $v0, var3
+    lw      $v0, var3
     bgez	$v0, main
     jr		$zero	
 

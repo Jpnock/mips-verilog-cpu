@@ -1,4 +1,4 @@
-# Expect: 0x09175FAC
+# Expect: 0x9175fac1
 
 .text
 .globl main

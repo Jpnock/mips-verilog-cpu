@@ -1,8 +1,8 @@
-# Expect: 0x003592D1
+# Expect: 0xD64
 
 .text
 .globl main
 main:
     la		$v0,  0x1AC968F1
-    srl		$v0, $v0, 0x111
+    srl		$v0, $v0, 17
     jr      $zero	
