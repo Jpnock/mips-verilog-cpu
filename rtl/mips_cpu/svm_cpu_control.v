@@ -41,8 +41,6 @@ module control (
 
   assign ram_readdata_valid = (~stall_i_delayed & ram_read_en_o_delayed);
 
-  logic default_pc_write_en_o, tmp_pc_write_en_o;
-  logic default_ir_write_en_o, tmp_ir_write_en_o;
   logic default_ram_write_en_o, tmp_ram_write_en_o;
   logic default_ram_read_en_o, tmp_ram_read_en_o;
   logic [3:0] default_ram_byte_en_o, tmp_ram_byte_en_o;
@@ -52,8 +50,8 @@ module control (
   regfile_addr_sel_t default_regfile_addr_3_sel_o, tmp_regfile_addr_3_sel_o;
 
   // Defaults
-  assign default_pc_write_en_o        = isStateEXEC2 & ~stall_i;
-  assign default_ir_write_en_o        = isStateEXEC1 & ram_readdata_valid;
+  assign pc_write_en_o                = isStateEXEC2 & ~stall_i;
+  assign ir_write_en_o                = isStateEXEC1 & ram_readdata_valid;
   assign default_ram_write_en_o       = 0;
   assign default_ram_read_en_o        = isStateFETCH;
   assign default_ram_byte_en_o        = (state_i == FETCH) ? 4'b1111 : 0;
@@ -63,8 +61,6 @@ module control (
   assign default_regfile_addr_3_sel_o = REGFILE_ADDR_SEL_RT;
 
   always_comb begin
-    tmp_pc_write_en_o        = default_pc_write_en_o;
-    tmp_ir_write_en_o        = default_ir_write_en_o;
     tmp_ram_write_en_o       = default_ram_write_en_o;
     tmp_ram_read_en_o        = default_ram_read_en_o;
     tmp_ram_byte_en_o        = default_ram_byte_en_o;
@@ -145,8 +141,6 @@ module control (
 
     endcase
 
-    pc_write_en_o        = tmp_pc_write_en_o;
-    ir_write_en_o        = tmp_ir_write_en_o;
     ram_write_en_o       = tmp_ram_write_en_o;
     ram_read_en_o        = tmp_ram_read_en_o;
     ram_byte_en_o        = tmp_ram_byte_en_o;

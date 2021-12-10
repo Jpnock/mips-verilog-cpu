@@ -164,6 +164,8 @@ module mips_cpu_bus (
         alu_out = rd_data_d;
       end
       default: begin
+        addr_3  = 5'd0;
+        alu_out = rd_data_d;
 `ifdef DEBUG
         $fatal(1, "unknown enum value for regfile_addr_3_sel");
 `endif
