@@ -36,7 +36,6 @@ module cpu_ram (
   logic ram_wait;
   assign ram_wait = RAM_WAIT;
 
-
   // This is little endian ordering as the lowest byte in memory is the least significant.
   logic [7:0] read_3, read_2, read_1, read_0;
   assign read_0 = ram[mapped_address];
