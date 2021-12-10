@@ -1,4 +1,3 @@
-# TODO: Remove debug outputs.
 # TODO: Remove TEST_WAIT input before submission?
 
 set -uo pipefail
@@ -6,14 +5,18 @@ set -uo pipefail
 SOURCE_DIR=${1:-rtl}
 TEST_INSTR=${2-}
 TEST_WAIT=${3:-1}
-TEST_FILES=$([[ -z "$TEST_INSTR" ]] && echo "test/mips/**/*.asm" || echo "test/mips/${TEST_INSTR}/*.asm")
+TEST_FILES=$([[ -z "$TEST_INSTR" ]] && find test/mips/** -type f \( -iname \*.asm -o -iname \*.c \) 2> /dev/null || find "test/mips/${TEST_INSTR}" -type f \( -iname \*.asm -o -iname \*.c \) 2> /dev/null)
+if [[ $? -ne 0 ]]; then
+    # No test files found
+    exit 0;
+fi
 
 EXIT_CODE=0
 
 for file in $TEST_FILES; do
     base_name=$(basename $file)
     dir_name=$(basename $(dirname $file))
-    unique_name="${dir_name}_${base_name%.asm}"
+    unique_name="${dir_name}_${base_name%.*}"
 
     mkdir -p ./test/bin
 
@@ -28,7 +31,7 @@ for file in $TEST_FILES; do
     }
 
     # Extract Expect Value
-    expected_value=$(head -n 1 "$file" | sed -n -e 's/^# Expect: //p')
+    expected_value=$(head -n 1 "$file" | sed -n -e 's/^\(#\|\/\/\) Expect: //p')
     if [[ -z $expected_value ]]; then
         fail_file "Did not find expected value in test case"
         continue
@@ -51,8 +54,11 @@ for file in $TEST_FILES; do
     # Run
     timeout 15s ./$out >"${testlog}" 2>&1
     if [[ $? -ne 0 ]]; then
-        got_value=$(grep -i -m 1 "Testbench expected 0x" "${testlog}" | tr -d '\n')
-        fail_file "Test bench exited with non-zero status code: ${got_value}"
+        fatal=$(grep -i -m 1 "Testbench expected 0x" "${testlog}" | tr -d '\n')
+        if [[ $? -ne 0 ]]; then
+            fatal=$(grep -m 1 "FATAL: " "${testlog}" | tr -d '\n')
+        fi
+        fail_file "Test bench exited with non-zero status code: ${fatal}"
         continue
     fi
 
