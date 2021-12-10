@@ -8,9 +8,9 @@ main:
     jr		$zero	
 
 L1: 
-    addi    $v0, $v0, -0x000F
+    addiu   $v0, $v0, -0x000F
     bgez	$v0, L2
-    addi    $v0, $v0, 0x00FF
+    addiu   $v0, $v0, 0x00FF
     jr		$zero	
 
 L2: 

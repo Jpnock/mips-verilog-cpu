@@ -8,7 +8,7 @@ main:
     jr		$zero	
 
 L1: 
-    addi    $v0, $v0, var2
+    addiu   $v0, $v0, var2
     bgez	$v0, L2
     jr		$zero	
 

@@ -10,7 +10,7 @@ main:
 L1: 
     la      $v0, -0x1
     bgez	$v0, L2
-    addi    $v0, $v0, 0x00FF
+    addiu   $v0, $v0, 0x00FF
     jr		$zero	
 
 L2: 
