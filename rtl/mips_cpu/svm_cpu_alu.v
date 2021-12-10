@@ -89,10 +89,58 @@ module alu (
 
   assign load_store_byte_offset_o = sign_extended_imm_plus_offset % 4;
 
+  size_t load_store_effective_addr;
+  assign load_store_effective_addr = sign_extended_imm_plus_offset & 32'hFFFFFFFC;
+
+  // Instructions that affect the mf_d output.
+  always_comb begin
+    if (opcode_i == OP_SPECIAL) begin
+      case (funct_i)
+        FUNC_MULT: begin
+          mf_d = $signed(rs_i) * $signed(rt_i);
+        end
+        FUNC_MULTU: begin
+          mf_d = rs_i * rt_i;
+        end
+        FUNC_DIV: begin
+          if (rt_i == 0) begin
+            mf_d = 0;
+          end else begin
+            mf_d[31:0]  = $signed(rs_i) / $signed(rt_i);
+            mf_d[63:32] = $signed(rs_i) % $signed(rt_i);
+          end
+        end
+        FUNC_DIVU: begin
+          if (rt_i == 0) begin
+            mf_d = 0;
+          end else begin
+            mf_d[31:0]  = rs_i / rt_i;
+            mf_d[63:32] = rs_i % rt_i;
+          end
+        end
+        default: begin
+          mf_d = 0;
+        end
+      endcase
+    end else begin
+      mf_d = 0;
+    end
+  end
+
+  // Instructions that affect the rd_o output.
   always_comb begin
     case (opcode_i)
+      OP_REGIMM: begin
+        if (regimm_i == REGIMM_BGEZAL || regimm_i == REGIMM_BLTZAL) begin
+          rd_o = pc_i + 8;
+        end else begin
+          rd_o = 0;
+        end
+      end
+      OP_JAL: rd_o = pc_i + 8;
       OP_SPECIAL: begin
         case (funct_i)
+          FUNC_JALR: rd_o = pc_i + 8;
           FUNC_SLL:  rd_o = rt_i << static_shift_amount;
           FUNC_SRL:  rd_o = rt_i >> static_shift_amount;
           FUNC_SRA:  rd_o = $signed(rt_i) >>> static_shift_amount;
@@ -113,28 +161,6 @@ module alu (
           FUNC_OR:   rd_o = rs_i | rt_i;
           FUNC_XOR:  rd_o = rs_i ^ rt_i;
           FUNC_NOR:  rd_o = rs_i~|rt_i;
-          FUNC_MULT: begin
-            mf_d = $signed(rs_i) * $signed(rt_i);
-          end
-          FUNC_MULTU: begin
-            mf_d = rs_i * rt_i;
-          end
-          FUNC_DIV: begin
-            if (rt_i == 0) begin
-              mf_d = 0;
-            end else begin
-              mf_d[31:0]  = $signed(rs_i) / $signed(rt_i);
-              mf_d[63:32] = $signed(rs_i) % $signed(rt_i);
-            end
-          end
-          FUNC_DIVU: begin
-            if (rt_i == 0) begin
-              mf_d = 0;
-            end else begin
-              mf_d[31:0]  = rs_i / rt_i;
-              mf_d[63:32] = rs_i % rt_i;
-            end
-          end
           FUNC_SLT: begin
             if ($signed(rs_i) < $signed(rt_i)) begin
               rd_o = 1;
@@ -149,9 +175,20 @@ module alu (
               rd_o = 0;
             end
           end
+          default: begin
+            rd_o = 0;
+          end
         endcase
       end
+      default: begin
+        rd_o = 0;
+      end
+    endcase
+  end
 
+  // Instructions that affect the rt_o output
+  always_comb begin
+    case (opcode_i)
       OP_ADDI: begin
         // TODO: fire exception on overflow
         rt_o = rs_i + sign_extended_imm;
@@ -177,20 +214,23 @@ module alu (
       OP_XORI:  rt_o = rs_i ^ zero_extended_imm;
       // TODO: LUI mentions something about sign extension but that doesn't make sense in this context.
       OP_LUI:   rt_o = {immediate_i, 16'b0};
+      // We need to be careful here if we're doing non 32-bit store
+      // operations (e.g. SH, SB). The representation of bytes or half-words
+      // will always be presented from bit 32, downward. For example an SB which
+      // stores 0xFF needs to be represented as 0xFF000000. A SH which stores
+      // 0x4142 will be represented as 0x41420000. These values need shifting to
+      // the correct location before outputting them. The same applies to loads,
+      // however they may be handled elsewhere.
       OP_LWL: begin
-        effective_address_o = sign_extended_imm_plus_offset & 32'hFFFFFFFC;
         rt_o = (ram_readdata_i << load_store_bit_offset) | (rt_i & (32'hFFFFFFFF >> (32-load_store_bit_offset)));
       end
       OP_LWR: begin
-        effective_address_o = sign_extended_imm_plus_offset & 32'hFFFFFFFC;
         rt_o = (ram_readdata_i >> (24 - load_store_bit_offset)) | (rt_i & (32'hFFFFFF00 << load_store_bit_offset));
       end
       OP_LW: begin
-        effective_address_o = sign_extended_imm_plus_offset & 32'hFFFFFFFC;
         rt_o = ram_readdata_i;
       end
       OP_LH: begin
-        effective_address_o = sign_extended_imm_plus_offset & 32'hFFFFFFFC;
         case (load_store_byte_offset_o)
           0: rt_o = signextend16to32({ram_readdata_offset_0, ram_readdata_offset_1});
           default: rt_o = signextend16to32({ram_readdata_offset_2, ram_readdata_offset_3});
@@ -201,15 +241,12 @@ module alu (
 `endif
       end
       OP_LHU: begin
-        effective_address_o = sign_extended_imm_plus_offset & 32'hFFFFFFFC;
         case (load_store_byte_offset_o)
           0: rt_o = zeroextend16to32({ram_readdata_offset_0, ram_readdata_offset_1});
           default: rt_o = zeroextend16to32({ram_readdata_offset_2, ram_readdata_offset_3});
         endcase
       end
       OP_LB: begin
-        effective_address_o = sign_extended_imm_plus_offset & 32'hFFFFFFFC;
-        //rt_o = (ram_readdata_i & (32'hFF000000 >> load_store_bit_offset)) >> (24 - load_store_bit_offset);
         case (load_store_byte_offset_o)
           0: rt_o = signextend8to32(ram_readdata_offset_0);
           1: rt_o = signextend8to32(ram_readdata_offset_1);
@@ -217,12 +254,11 @@ module alu (
           default: rt_o = signextend8to32(ram_readdata_offset_3);
         endcase
 `ifdef DEBUG
-        $display("got data from ram 0x%08x @ 0x%08x, loading byte 0x%08x with offset %d",
+        $display("got LB instruction data 0x%08x @ 0x%08x, loading byte 0x%08x with offset %d",
                  ram_readdata_i, effective_address_o, rt_o, load_store_byte_offset_o);
 `endif
       end
       OP_LBU: begin
-        effective_address_o = sign_extended_imm_plus_offset & 32'hFFFFFFFC;
         case (load_store_byte_offset_o)
           0: rt_o = {24'b0, ram_readdata_offset_0};
           1: rt_o = {24'b0, ram_readdata_offset_1};
@@ -231,15 +267,12 @@ module alu (
         endcase
       end
       OP_SW: begin
-        effective_address_o = sign_extended_imm_plus_offset;
         rt_o = rt_i;
       end
       OP_SH: begin
-        effective_address_o = sign_extended_imm_plus_offset & 32'hFFFFFFFC;
         rt_o = (load_store_byte_offset_o == 0) ? (rt_i << 16) : (rt_i & 32'h0000FFFF);
       end
       OP_SB: begin
-        effective_address_o = sign_extended_imm_plus_offset & 32'hFFFFFFFC;
         case (load_store_byte_offset_o)
           0: rt_o = (rt_i << 24) & 32'hFF000000;
           1: rt_o = (rt_i << 16) & 32'h00FF0000;
@@ -247,19 +280,14 @@ module alu (
           default: rt_o = rt_i & 32'h000000FF;
         endcase
       end
-      // TODO: we need to be careful here if we're doing non 32-bit store
-      // operations (e.g. SH, SB). The representation of bytes or half-words
-      // will always be presented from bit 32, downward. For example an SB which
-      // stores 0xFF needs to be represented as 0xFF000000. A SH which stores
-      // 0x4142 will be represented as 0x41420000. These values need shifting to
-      // the correct location before outputting them. The same applies to loads,
-      // however they may be handled elsewhere.
-      default:  ;
+      default: begin
+        rt_o = 0;
+      end
     endcase
+  end
 
-    b_cond_met_o = 1'b0;
-
-    // branch condition
+  // Calculate whether the branch condition is met.
+  always_comb begin
     case (opcode_i)
       OP_BEQ:  b_cond_met_o = (rs_i == rt_i) ? 1'b1 : 1'b0;
       OP_BGTZ: b_cond_met_o = ($signed(rs_i) > 0) ? 1'b1 : 1'b0;
@@ -267,42 +295,44 @@ module alu (
       OP_BNE:  b_cond_met_o = (rs_i != rt_i) ? 1'b1 : 1'b0;
 
       OP_J, OP_JAL: b_cond_met_o = 1'b1;
-
       OP_SPECIAL: begin
         case (funct_i)
           FUNC_JR, FUNC_JALR: b_cond_met_o = 1'b1;
+          default: b_cond_met_o = 0;
         endcase
       end
 
-      // BGEZAL and BLTZAL must not use GBR[31]/$ra as the register to test the
-      // jump condition from. This seems to be a compiler restriction, though. 
       OP_REGIMM: begin
         case (regimm_i)
+          // BGEZAL and BLTZAL must not use GBR[31]/$ra as the register to test the
+          // jump condition from. This seems to be a compiler restriction, though. 
           REGIMM_BLTZ, REGIMM_BLTZAL: b_cond_met_o = ($signed(rs_i) < 0) ? 1'b1 : 1'b0;
           REGIMM_BGEZ, REGIMM_BGEZAL: b_cond_met_o = ($signed(rs_i) >= 0) ? 1'b1 : 1'b0;
+          default: b_cond_met_o = 0;
         endcase
       end
+
+      default: b_cond_met_o = 0;
     endcase
+  end
 
-    // saving return address. happens regardless if branch condition is met
-    // TODO: The control logic for writing to the register file needs to be handled.
+  // Determine effective address for loads, stores, jumps and branches.
+  always_comb begin
     case (opcode_i)
-      //GPR[31] = PC + 8
-      OP_REGIMM: if (regimm_i == REGIMM_BGEZAL || regimm_i == REGIMM_BLTZAL) rd_o = pc_i + 8;
-      OP_JAL: rd_o = pc_i + 8;
+      OP_LWL, OP_LWR, OP_LW, OP_LH, OP_LHU, OP_LB, OP_LBU, OP_SW, OP_SH, OP_SB: begin
+        effective_address_o = load_store_effective_addr;
+      end
 
-      // this one should be GPR[rd] = PC + 8
-      OP_SPECIAL: if (funct_i == FUNC_JALR) rd_o = pc_i + 8;
-    endcase
-
-    // Determine branch address
-    case (opcode_i)
       // branch is relative to branch delay slot
       OP_BEQ, OP_BGTZ, OP_BLEZ, OP_BNE: effective_address_o = (sign_extended_imm << 2) + pc_i + 4;
       OP_REGIMM: begin
         case (regimm_i)
-          REGIMM_BLTZ, REGIMM_BGEZ, REGIMM_BLTZAL, REGIMM_BGEZAL:
-          effective_address_o = (sign_extended_imm << 2) + pc_i + 4;
+          REGIMM_BLTZ, REGIMM_BGEZ, REGIMM_BLTZAL, REGIMM_BGEZAL: begin
+            effective_address_o = (sign_extended_imm << 2) + pc_i + 4;
+          end
+          default: begin
+            effective_address_o = 0;
+          end
         endcase
       end
 
@@ -314,10 +344,13 @@ module alu (
       OP_SPECIAL: begin
         case (funct_i)
           FUNC_JALR, FUNC_JR: effective_address_o = rs_i;
+          default: effective_address_o = 0;
         endcase
       end
+      default: begin
+        effective_address_o = 0;
+      end
     endcase
-
   end
 
   always_ff @(posedge clk) begin
