@@ -4,6 +4,6 @@
 .globl main
 main:
     la		$v0,  0xD957AC1F
-    la		$t0,  0x00001101
+    la		$t0,  13
     srav    $v0, $v0, $t0
     jr      $zero	
