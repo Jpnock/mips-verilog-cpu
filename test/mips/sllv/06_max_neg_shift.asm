@@ -3,8 +3,8 @@
 .text
 .globl main
 main:
-    la		$t0,  -0xFFFFFFFF
-    la		$t1,  0x0000001F
+    li		$t0,  -0xFFFFFFFF
+    li		$t1,  0x0000001F
     sllv $v0, $t0, $t1
     jr $zero
 
