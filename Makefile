@@ -20,6 +20,7 @@ build:
 build-tests:
 	@printf "\033[34;1m▶\033[0m Assembling tests\n"
 	@(cd test; ./build_instruction_testbench.sh)
+	@(cd test; ./build_c_testbench.sh)
 	@printf "\033[34;1m ...\033[0m assembled\n"
 
 test:
