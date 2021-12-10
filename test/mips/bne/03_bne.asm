@@ -1,4 +1,4 @@
-# Expect: 0x9174
+# Expect: 0xffff9174
 
 .text
 .globl main

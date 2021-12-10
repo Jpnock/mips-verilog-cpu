@@ -10,7 +10,7 @@ main:
 L1: 
     addiu    $v0, $v0, 0xA		
     addiu    $v0, $v0, 0x816
-    li       $v1, 0x9D79
+    li       $v1, 0x9D7A
     bne	     $v0, $v1, main
     
 
