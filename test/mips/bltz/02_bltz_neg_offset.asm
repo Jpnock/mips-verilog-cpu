@@ -1,12 +1,10 @@
-# Expect: 0x132D2
+# Expect: 0xF0009563
 
 .text
 .globl main
 main:   
-    addi    $v0, $v0, 0x9559
-    la		$t1, -0x9561	
-    addu    $t1, $t1, $v0
-    bgtz    $t1, L3
+    addi    $v0, $v0, 0x9559	
+    bltz    $v0, L3
     
 L1: 
     addi    $v0, $v0, 0xA	

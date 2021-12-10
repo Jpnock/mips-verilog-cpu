@@ -11,7 +11,8 @@ main:
 L1: 
     addi    $v0, $v0, 0xA		
     addi    $v0, $v0, 0x816
-    bne	    $v0, main
+    la      $v1, 0x132D2
+    bne	    $v0, $v1, main
     
 
 L3:
