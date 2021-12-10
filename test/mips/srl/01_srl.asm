@@ -3,6 +3,6 @@
 .text
 .globl main
 main:
-    lw		$v0,  0x5671AC00
+    la		$v0,  0x5671AC00
     srl		$v0, $v0, 0x10
     jr      $zero		

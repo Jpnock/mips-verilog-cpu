@@ -1,4 +1,4 @@
-# Expect: 0x860C
+# Expect: 0xffff860c
 
 .text
 .globl main
