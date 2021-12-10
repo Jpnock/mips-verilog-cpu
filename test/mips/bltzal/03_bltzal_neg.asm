@@ -4,6 +4,7 @@
 .globl main
 main:   
     addi    $v0, $v0, 0x47A3
+    jr      $ra
     
 
 L1: 
