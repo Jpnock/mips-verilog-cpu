@@ -99,8 +99,8 @@ module control (
             OP_LW: tmp_ram_byte_en_o = 4'b1111;
             OP_LH, OP_LHU: tmp_ram_byte_en_o = 4'b0011 << load_store_byte_offset_i;
             OP_LB, OP_LBU: tmp_ram_byte_en_o = 4'b0001 << load_store_byte_offset_i;
-            OP_LWL: tmp_ram_byte_en_o = 4'b1111;  // TODO: do the read enables on this
-            OP_LWR: tmp_ram_byte_en_o = 4'b1111;  // TODO: do the read enables on this
+            OP_LWL: tmp_ram_byte_en_o = 4'b1111 << load_store_byte_offset_i;
+            OP_LWR: tmp_ram_byte_en_o = 4'b1111 >> (3 - load_store_byte_offset_i);
           endcase
         end
         tmp_regfile_write_en_o = isStateEXEC2 | default_regfile_write_en_o;
@@ -114,16 +114,9 @@ module control (
           FUNC_SLL, FUNC_SRL, FUNC_SRA, FUNC_SLLV, FUNC_SRLV, FUNC_SRAV, 
             FUNC_MFHI, FUNC_MFLO,
             FUNC_ADD, FUNC_ADDU, FUNC_SUB, FUNC_SUBU, FUNC_AND, FUNC_OR, FUNC_XOR, FUNC_NOR,
-            FUNC_SLT, FUNC_SLTU: begin
+            FUNC_SLT, FUNC_SLTU, FUNC_JALR: begin
             if (isStateEXEC2) begin
               tmp_regfile_write_en_o   = 1;
-              tmp_regfile_addr_3_sel_o = REGFILE_ADDR_SEL_RD;
-            end
-          end
-
-          FUNC_JALR: begin
-            if (isStateEXEC2) begin
-              tmp_regfile_write_en_o   = b_cond_met_i;
               tmp_regfile_addr_3_sel_o = REGFILE_ADDR_SEL_RD;
             end
           end
@@ -134,7 +127,7 @@ module control (
       end
       OP_JAL: begin
         if (isStateEXEC2) begin
-          tmp_regfile_write_en_o   = b_cond_met_i;
+          tmp_regfile_write_en_o   = 1;
           tmp_regfile_addr_3_sel_o = REGFILE_ADDR_SEL_GPR31;
         end
       end
