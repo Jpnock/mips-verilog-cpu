@@ -5,7 +5,7 @@
 main:   
     addi    $v0, $v0, 0x8164
     la      $t0, 0x1aee5
-    beq     $v0, $t1, L3
+    beq     $v0, $t0, L3
     
 L1: 
     addi    $v0, $v0, 0xAC1D
