@@ -1,4 +1,4 @@
-# Expect: 0xBFC06B04
+# Expect: 0xBFC06B0C
 
 .text
 .globl main
