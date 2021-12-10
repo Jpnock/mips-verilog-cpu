@@ -1,16 +1,8 @@
 // Expect: 122
 
 int fact(int a);
-int outerfact();
 
 int main()
-{
-    int result = outerfact();
-    asm("jr $zero");
-    return result;
-}
-
-int outerfact()
 {
     int result = fact(5);
     return result + 2;
