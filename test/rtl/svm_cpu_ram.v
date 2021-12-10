@@ -17,12 +17,11 @@ module cpu_ram (
   parameter RAM_FILE = "";
   parameter RAM_WAIT = 0;
   parameter RAM_OFFSET = 32'hBFC00000;
-  parameter RAM_BYTES = 1024;
+  parameter RAM_BYTES = 4096;
 
   logic [7:0] ram[RAM_BYTES-1:0];
 
   initial begin
-    // TODO: check endianness
     $readmemh(RAM_FILE, ram, 0, RAM_BYTES - 1);
     // print out a few contents of the ram
     for (integer i = 0; i < 10; i++) begin
@@ -70,6 +69,9 @@ module cpu_ram (
                  byteenable[3] ? writedata[31:24] : read_3
                  }, address);
 `endif
+        if (mapped_address > RAM_BYTES) begin
+          $fatal(1, "out of bounds write to 0x%08h", address);
+        end
         ram[mapped_address]   <= write_0;
         ram[mapped_address+1] <= write_1;
         ram[mapped_address+2] <= write_2;
@@ -78,6 +80,9 @@ module cpu_ram (
 `ifdef DEBUG
         $display("read @ 0x%08x, got 0x%08x", address, {read_0, read_1, read_2, read_3});
 `endif
+        if (mapped_address > RAM_BYTES) begin
+          $fatal(1, "out of bounds read from 0x%08h", address);
+        end
         readdata <= {read_3, read_2, read_1, read_0};
       end
     end
