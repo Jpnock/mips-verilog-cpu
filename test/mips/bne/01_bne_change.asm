@@ -7,9 +7,9 @@ main:
     bne		$v0, $v1, L1
     jr      $zero
 L1:
-    addi	$v0, $v0, var2
+    addiu	$v0, $v0, var2
     bne		$v0, $v1, L2
-    addi	$v0, $v0, var3
+    addiu	$v0, $v0, var3
     jr      $zero
 L2:
     lw      $v0, var3

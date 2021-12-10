@@ -3,13 +3,13 @@
 .text
 .globl main
 main:   
-    addi    $v0, $v0, 0x8164
-    la      $t0, 0x1aee5
+    addiu    $v0, $v0, 0x8164
+    li      $t0, 0x1aee5
     beq     $v0, $t0, L3
     
 L1: 
-    addi    $v0, $v0, 0xAC1D
-    la      $t1, 0x12D81
+    addiu    $v0, $v0, 0xAC1D
+    li      $t1, 0x12D81
     beq 	$v0, $t1, main
     
 

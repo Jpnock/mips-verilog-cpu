@@ -3,12 +3,12 @@
 .text
 .globl main
 main:   
-    addi    $v0, $v0, 0x9559	
+    addiu    $v0, $v0, 0x9559	
     bltz    $v0, L3
     
 L1: 
-    addi    $v0, $v0, 0xA	
-    la      $t0, 0xF0000000
+    addiu    $v0, $v0, 0xA	
+    li      $t0, 0xF0000000
     addu    $v0, $v0, $t0
     bltz	$v0, main
     

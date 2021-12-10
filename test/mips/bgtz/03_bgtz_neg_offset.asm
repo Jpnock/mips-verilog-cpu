@@ -3,8 +3,8 @@
 .text
 .globl main
 main:   
-    addi    $v0, $v0, 0x0FC0
-    la      $t1, 0x1F8B
+    addiu    $v0, $v0, 0x0FC0
+    li      $t1, 0x1F8B
     beq     $v0, $t1, L3
     
 L1: 
