@@ -8,4 +8,4 @@ main:
     jr $zero
 
 .data
-var1: .word 0x41424344
+    var1: .word 0x41424344

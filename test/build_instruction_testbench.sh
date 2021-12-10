@@ -1,3 +1,5 @@
+rm -f mips/**/*.hex
+
 for f in mips/**/*.asm
 do
     mips-linux-gnu-as -R -mips1 -mfix7000 -o "$f.out" "$f"

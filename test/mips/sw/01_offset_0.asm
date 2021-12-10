@@ -11,4 +11,4 @@ main:
     jr $zero
 
 .data
-var1: .word 0x00000000
+    var1: .word 0x00000000
