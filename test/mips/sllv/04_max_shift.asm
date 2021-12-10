@@ -1,4 +1,4 @@
-# Expect: 0xF80000000
+# Expect: 0x80000000
 
 .text
 .globl main
