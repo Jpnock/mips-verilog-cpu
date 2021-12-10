@@ -7,3 +7,4 @@ main:
     la		$t1,  0x0000001F 
     sllv $v0, $t0, $t1
     jr $zero
+
