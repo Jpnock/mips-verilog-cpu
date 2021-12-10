@@ -10,7 +10,7 @@ main:
 L1: 
     addi    $v0, $v0, 0xAC1D
     la      $t1, 0x12D81
-    beq 	$v0, main
+    beq 	$v0, $t1, main
     
 
 L3:

@@ -1,15 +1,15 @@
-# Expect: 0x81656C36
+# Expect: 0x81656c36
 
 .text
 .globl main
 
 main:
-    la      $v1, 0x8164DAC2
+    li      $v1, 0x8164DAC2
     bne     $v0, $v1, L1
-    la      $v0, 0x8164DAC2
+    li      $v0, 0x8164DAC2
     bne     $v0, $v1, L1
     jr		$zero
 
 L1:
-    addi	$v0, $v0, 0x9174	
+    addiu	$v0, $v0, 0x9174	
     jr		$zero		
