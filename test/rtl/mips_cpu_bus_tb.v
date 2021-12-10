@@ -26,13 +26,13 @@ module mips_cpu_bus_tb ();
 
     clk = 0;
     #1;
-    repeat (256) begin
+    repeat (2048) begin
       #2;
       clk = !clk;
     end
 
     assert (active == 0)
-    else $fatal(1, "Testbench did not execute within 256 cycles");
+    else $fatal(1, "Testbench did not execute within 2048 cycles");
 
     assert (register_v0 == expected_value_reg)
     else $fatal(1, "Testbench expected 0x%08x but got 0x%08x", expected_value_reg, register_v0);
