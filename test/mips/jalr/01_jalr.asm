@@ -5,7 +5,7 @@
 main: 
     lw      $v0, var1  
     addiu   $v0, $v0, 0x15AD
-    li		$t1, 0xbfc0001c  
+    li		$t1, 0xbfc00014  
     jalr	$t1
     jr		$zero	
 

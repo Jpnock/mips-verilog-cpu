@@ -4,7 +4,7 @@
 .globl main
 main:   
     addiu    $v0, $v0, 0x9559
-    li		 $t1, 0x132D2	
+    li		 $t1, 0x9559
     beq      $v0, $t1, L2
      
 L1: 
