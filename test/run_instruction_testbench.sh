@@ -14,11 +14,17 @@ fi
 EXIT_CODE=0
 
 for file in $(echo "$TEST_FILES" | sort); do
+    EXTRA_ARGS=""
+
     base_name=$(basename $file)
     dir_name=$(basename $(dirname $file))
     unique_name="${dir_name}_${base_name%.*}"
 
     mkdir -p ./test/bin
+
+    if [[ "$file" == *"_read_byte_en"* ]]; then
+        EXTRA_ARGS="-DDESTROY_BYTE_ENABLE_TEST"
+    fi
 
     # Logging/Output Files
     out="./test/bin/${unique_name}.out"
@@ -38,7 +44,7 @@ for file in $(echo "$TEST_FILES" | sort); do
     fi
 
     #Build TB
-    iverilog -DDEBUG -Wall -g 2012 \
+    iverilog -DDEBUG ${EXTRA_ARGS} -Wall -g 2012 \
         ${SOURCE_DIR}/mips_cpu/*.v ${SOURCE_DIR}/mips_cpu_*.v ./test/rtl/*.v \
         -pfileline=1 \
         -s mips_cpu_bus_tb \
