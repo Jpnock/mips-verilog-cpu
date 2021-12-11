@@ -1,3 +1,5 @@
+set -euo pipefail
+
 for f in mips/**/*.c
 do
     mips-linux-gnu-gcc -O1 -fno-toplevel-reorder -ffreestanding -nostdlib -fno-pie -EB -mips1 -mfp32 -Wa,"-R,-mips1,-march=mips1,-mfp32" -Wl,"-e 0xBFC00008,-Ttext=0xBFC00008" -o "$f.out" "$f"

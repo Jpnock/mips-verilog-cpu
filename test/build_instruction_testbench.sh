@@ -1,3 +1,5 @@
+set -euo pipefail
+
 rm -f mips/**/*.hex
 
 for f in mips/**/*.asm
