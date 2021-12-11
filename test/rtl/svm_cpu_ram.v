@@ -84,13 +84,37 @@ module cpu_ram (
         ram[mapped_address+2] <= write_2;
         ram[mapped_address+3] <= write_3;
       end else if (read) begin
-`ifdef DEBUG
-        $display("read @ 0x%08x, got 0x%08x", address, {read_0, read_1, read_2, read_3});
+`ifdef PC_PLUS_FOUR_REL_TEST
+        if (mapped_address == -264241156) begin
+`ifdef PC_PLUS_FOUR_REL_TEST_JAL
+          // JAL 0xBFC00030
+          readdata <= 32'h0C00F00F;
+`else
+          // J 0xBFC00030
+          readdata <= 32'h0C00F00B;
 `endif
+        end else if (mapped_address == -264241156 + 4) begin
+          // NOP
+          readdata <= 0;
+        end else if (mapped_address > RAM_BYTES) begin
+          $fatal(1, "out of bounds read from 0x%08h", address);
+        end else begin
+`ifdef DEBUG
+          $display("read @ 0x%08x, got 0x%08x", address, {read_0, read_1, read_2, read_3});
+`endif
+          readdata <= {read_3, read_2, read_1, read_0};
+        end
+`else
         if (mapped_address > RAM_BYTES) begin
           $fatal(1, "out of bounds read from 0x%08h", address);
+        end else begin
+`ifdef DEBUG
+          $display("read @ 0x%08x, got 0x%08x", address, {read_0, read_1, read_2, read_3});
+`endif
+          readdata <= {read_3, read_2, read_1, read_0};
         end
-        readdata <= {read_3, read_2, read_1, read_0};
+`endif
+
 `ifdef DESTROY_BYTE_ENABLE_TEST
         if (byteenable_0) begin
           ram[mapped_address] <= 8'hFF;
