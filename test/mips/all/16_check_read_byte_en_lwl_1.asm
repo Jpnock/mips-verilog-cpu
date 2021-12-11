@@ -1,4 +1,5 @@
 # Expect: 0x01FFFFFF
+# Args: -DDESTROY_BYTE_ENABLE_TEST
 
 # Experimental test which defines DESTROY_BYTE_ENABLE_TEST to cause
 # memory to be set to 0xFF after a read if the byte-enable flag

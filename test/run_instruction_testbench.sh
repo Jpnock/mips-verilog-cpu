@@ -22,10 +22,6 @@ for file in $(echo "$TEST_FILES" | sort); do
 
     mkdir -p ./test/bin
 
-    if [[ "$file" == *"_read_byte_en"* ]]; then
-        EXTRA_ARGS="-DDESTROY_BYTE_ENABLE_TEST"
-    fi
-
     # Logging/Output Files
     out="./test/bin/${unique_name}.out"
     buildlog="./test/bin/${unique_name}.build.log"
@@ -42,6 +38,8 @@ for file in $(echo "$TEST_FILES" | sort); do
         fail_file "Did not find expected value in test case"
         continue
     fi
+
+    EXTRA_ARGS=$(head -n 2 "$file" | sed -n -e 's/^\(#\|\/\/\) Args: //p')
 
     #Build TB
     iverilog -DDEBUG ${EXTRA_ARGS} -Wall -g 2012 \
