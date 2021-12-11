@@ -1,17 +1,11 @@
-# Expect: 0xffff2d81
+# Expect: 0xffff8165
 
 .text
 .globl main
 main:   
-    addiu    $v0, $v0, 0x8164
-    li      $t0, 0x0001aee5
-    beq     $v0, $t0, L3
-    
-L1: 
-    addiu    $v0, $v0, 0xAC1D
-    li      $t1, 0x00012D81
-    beq 	$v0, $t1, main
-    
-
-L3:
-    jr      $zero
+    addiu $v0, $v0, 0x8163
+    addiu $t0, $t0, 0x8164
+    beq $v0, $t0, L3
+L1: addiu $v0, $v0, 1
+L2: beq $v0, $t0, L1
+L3: jr $zero
