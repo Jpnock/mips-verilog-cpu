@@ -1,14 +1,13 @@
-# Expect: 0x00000014
+# Expect: 0xBA8024CD
 
 .text
 .globl main
 main:
-    lb $t0, var
-    la $t1, var2
-    sb $t0, 0($t1)
-    lb $v0, 0($t1)
+    lw $t0, var1
+    sb $t0, var2
+    lw $v0, var2
     jr $zero
 
 .data
-    var: .word 0x14589BBA
+    var1: .word 0x14589BBA
     var2: .word 0x468024CD
