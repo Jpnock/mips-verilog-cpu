@@ -13,7 +13,7 @@ fi
 
 EXIT_CODE=0
 
-for file in $TEST_FILES; do
+for file in $(echo "$TEST_FILES" | sort); do
     base_name=$(basename $file)
     dir_name=$(basename $(dirname $file))
     unique_name="${dir_name}_${base_name%.*}"
