@@ -21,8 +21,10 @@ module mips_cpu_bus_tb ();
   assign expected_value_reg = EXPECTED_VALUE;
 
   initial begin
+`ifdef DEBUG_VCD
     $dumpfile("mips_cpu_bus_tb.vcd");
     $dumpvars(0, mips_cpu_bus_tb);
+`endif
 
     clk = 0;
     #1;
