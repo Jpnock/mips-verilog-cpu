@@ -15,7 +15,6 @@ module control (
     output logic ram_read_en_o,
     output logic [3:0] ram_byte_en_o,
     output logic ram_addr_sel_o,
-    output logic src_b_sel_o,
     output logic regfile_write_en_o,
     output regfile_addr_sel_t regfile_addr_3_sel_o
 );
@@ -45,7 +44,6 @@ module control (
   logic default_ram_read_en_o, tmp_ram_read_en_o;
   logic [3:0] default_ram_byte_en_o, tmp_ram_byte_en_o;
   logic default_ram_addr_sel_o, tmp_ram_addr_sel_o;
-  logic default_src_b_sel_o, tmp_src_b_sel_o;
   logic default_regfile_write_en_o, tmp_regfile_write_en_o;
   regfile_addr_sel_t default_regfile_addr_3_sel_o, tmp_regfile_addr_3_sel_o;
 
@@ -56,7 +54,6 @@ module control (
   assign default_ram_read_en_o        = isStateFETCH;
   assign default_ram_byte_en_o        = (state_i == FETCH) ? 4'b1111 : 0;
   assign default_ram_addr_sel_o       = 0;
-  assign default_src_b_sel_o          = 0;
   assign default_regfile_write_en_o   = 0;
   assign default_regfile_addr_3_sel_o = REGFILE_ADDR_SEL_RT;
 
@@ -65,7 +62,6 @@ module control (
     tmp_ram_read_en_o        = default_ram_read_en_o;
     tmp_ram_byte_en_o        = default_ram_byte_en_o;
     tmp_ram_addr_sel_o       = default_ram_addr_sel_o;
-    tmp_src_b_sel_o          = default_src_b_sel_o;
     tmp_regfile_write_en_o   = default_regfile_write_en_o;
     tmp_regfile_addr_3_sel_o = default_regfile_addr_3_sel_o;
 
@@ -73,7 +69,6 @@ module control (
       OP_SW, OP_SH, OP_SB: begin
         if (isStateEXEC2) begin
           tmp_ram_write_en_o = 1;
-          tmp_src_b_sel_o = 1;
           tmp_ram_addr_sel_o = 1;
           case (opcode_i)
             OP_SW: tmp_ram_byte_en_o = 4'b1111;
@@ -88,8 +83,7 @@ module control (
       end
       OP_LW, OP_LH, OP_LHU, OP_LB, OP_LBU, OP_LWL, OP_LWR: begin
         if (isStateEXEC1) begin
-          tmp_ram_read_en_o = 1;
-          tmp_src_b_sel_o = 1;
+          tmp_ram_read_en_o  = 1;
           tmp_ram_addr_sel_o = 1;
           case (opcode_i)
             OP_LW: tmp_ram_byte_en_o = 4'b1111;
@@ -103,7 +97,6 @@ module control (
       end
       OP_ADDI, OP_ADDIU, OP_SLTI, OP_SLTIU, OP_ANDI, OP_ORI, OP_XORI, OP_LUI: begin
         tmp_regfile_write_en_o = isStateEXEC2 | default_regfile_write_en_o;
-        tmp_src_b_sel_o = isStateEXEC2 | default_src_b_sel_o;
       end
       OP_SPECIAL: begin
         case (function_i)
@@ -145,7 +138,6 @@ module control (
     ram_read_en_o        = tmp_ram_read_en_o;
     ram_byte_en_o        = tmp_ram_byte_en_o;
     ram_addr_sel_o       = tmp_ram_addr_sel_o;
-    src_b_sel_o          = tmp_src_b_sel_o;
     regfile_write_en_o   = tmp_regfile_write_en_o;
     regfile_addr_3_sel_o = tmp_regfile_addr_3_sel_o;
   end

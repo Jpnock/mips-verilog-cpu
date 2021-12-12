@@ -32,7 +32,7 @@ module mips_cpu_bus (
   func_t   funct;
   opcode_t opcode;
   regimm_t regimm;
-  logic pc_write_en, ir_write_en, regfile_write_en, src_b_sel, ram_addr_sel;
+  logic pc_write_en, ir_write_en, regfile_write_en, ram_addr_sel;
   logic [1:0] regfile_addr_3_sel;
 
   // PC
@@ -112,7 +112,6 @@ module mips_cpu_bus (
       .ram_read_en_o(ram_read_en),
       .ram_byte_en_o(byteenable),
       .ram_addr_sel_o(ram_addr_sel),
-      .src_b_sel_o(src_b_sel),
       .regfile_write_en_o(regfile_write_en),
       .regfile_addr_3_sel_o(regfile_addr_3_sel)
   );
