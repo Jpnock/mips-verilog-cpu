@@ -4,7 +4,7 @@
 .text
 .globl main
 main:
-    # Expect 0xBFC00000-0xFC00004=0xAFFFFFFC to contain JAL 0x30
+    # Expect 0xBFC00000-0xFC00004=0xAFFFFFFC to contain J 0x30
     li $t0, 0xAFFFFFFC
     jr $t0
     # NOP sled down to 0x30
