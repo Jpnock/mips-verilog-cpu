@@ -3,6 +3,6 @@
 .text
 .globl main
 main:
-    addiu $t1, $t1, 0x1F
-    andi $v0, $t1, 0x14
+    li $t1, 0xFF00001F
+    andi $v0, $t1, 0xFF14
     jr $zero
