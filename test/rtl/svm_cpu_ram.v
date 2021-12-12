@@ -35,6 +35,13 @@ module cpu_ram (
   logic ram_wait;
   assign ram_wait = RAM_WAIT;
 
+  logic byteenable_0, byteenable_1, byteenable_2, byteenable_3;
+
+  assign byteenable_0 = byteenable[0];
+  assign byteenable_1 = byteenable[1];
+  assign byteenable_2 = byteenable[2];
+  assign byteenable_3 = byteenable[3];
+
   // This is little endian ordering as the lowest byte in memory is the least significant.
   logic [7:0] read_3, read_2, read_1, read_0;
   assign read_0 = ram[mapped_address];
@@ -43,10 +50,10 @@ module cpu_ram (
   assign read_3 = ram[mapped_address+3];
 
   logic [7:0] write_3, write_2, write_1, write_0;
-  assign write_0 = (byteenable[0] == 1) ? writedata[7:0] : read_0;
-  assign write_1 = (byteenable[1] == 1) ? writedata[15:8] : read_1;
-  assign write_2 = (byteenable[2] == 1) ? writedata[23:16] : read_2;
-  assign write_3 = (byteenable[3] == 1) ? writedata[31:24] : read_3;
+  assign write_0 = (byteenable_0 == 1) ? writedata[7:0] : read_0;
+  assign write_1 = (byteenable_1 == 1) ? writedata[15:8] : read_1;
+  assign write_2 = (byteenable_2 == 1) ? writedata[23:16] : read_2;
+  assign write_3 = (byteenable_3 == 1) ? writedata[31:24] : read_3;
 
   always_ff @(posedge clk) begin
     if (ram_wait == 1) begin
@@ -63,10 +70,10 @@ module cpu_ram (
       if (write) begin
 `ifdef DEBUG
         $display("write got: 0x%08x @ %08x", {
-                 byteenable[0] ? writedata[7:0] : read_0,
-                 byteenable[1] ? writedata[15:8] : read_1,
-                 byteenable[2] ? writedata[23:16] : read_2,
-                 byteenable[3] ? writedata[31:24] : read_3
+                 byteenable_0 ? writedata[7:0] : read_0,
+                 byteenable_1 ? writedata[15:8] : read_1,
+                 byteenable_2 ? writedata[23:16] : read_2,
+                 byteenable_3 ? writedata[31:24] : read_3
                  }, address);
 `endif
         if (mapped_address > RAM_BYTES) begin
@@ -77,13 +84,51 @@ module cpu_ram (
         ram[mapped_address+2] <= write_2;
         ram[mapped_address+3] <= write_3;
       end else if (read) begin
-`ifdef DEBUG
-        $display("read @ 0x%08x, got 0x%08x", address, {read_0, read_1, read_2, read_3});
+`ifdef PC_PLUS_FOUR_REL_TEST
+        if (mapped_address == -264241156) begin
+`ifdef PC_PLUS_FOUR_REL_TEST_JAL
+          // JAL 0xBFC00030
+          readdata <= 32'h0C00F00F;
+`else
+          // J 0xBFC00030
+          readdata <= 32'h0C00F00B;
 `endif
+        end else if (mapped_address == -264241156 + 4) begin
+          // NOP
+          readdata <= 0;
+        end else if (mapped_address > RAM_BYTES) begin
+          $fatal(1, "out of bounds read from 0x%08h", address);
+        end else begin
+`ifdef DEBUG
+          $display("read @ 0x%08x, got 0x%08x", address, {read_0, read_1, read_2, read_3});
+`endif
+          readdata <= {read_3, read_2, read_1, read_0};
+        end
+`else
         if (mapped_address > RAM_BYTES) begin
           $fatal(1, "out of bounds read from 0x%08h", address);
+        end else begin
+`ifdef DEBUG
+          $display("read @ 0x%08x, got 0x%08x", address, {read_0, read_1, read_2, read_3});
+`endif
+          readdata <= {read_3, read_2, read_1, read_0};
         end
-        readdata <= {read_3, read_2, read_1, read_0};
+`endif
+
+`ifdef DESTROY_BYTE_ENABLE_TEST
+        if (byteenable_0) begin
+          ram[mapped_address] <= 8'hFF;
+        end
+        if (byteenable_1) begin
+          ram[mapped_address+1] <= 8'hFF;
+        end
+        if (byteenable_2) begin
+          ram[mapped_address+2] <= 8'hFF;
+        end
+        if (byteenable_3) begin
+          ram[mapped_address+3] <= 8'hFF;
+        end
+`endif
       end
     end
   end
