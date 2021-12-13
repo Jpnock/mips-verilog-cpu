@@ -68,7 +68,7 @@ module cpu_ram (
       readdata <= 32'hxxxxxxxx;
     end else begin
       if (write) begin
-`ifdef DEBUG
+`ifdef DEBUG_T13
         $display("write got: 0x%08x @ %08x", {
                  byteenable_0 ? writedata[7:0] : read_0,
                  byteenable_1 ? writedata[15:8] : read_1,
@@ -99,7 +99,7 @@ module cpu_ram (
         end else if (mapped_address > RAM_BYTES) begin
           $fatal(1, "out of bounds read from 0x%08h", address);
         end else begin
-`ifdef DEBUG
+`ifdef DEBUG_T13
           $display("read @ 0x%08x, got 0x%08x", address, {read_0, read_1, read_2, read_3});
 `endif
           readdata <= {read_3, read_2, read_1, read_0};
@@ -108,7 +108,7 @@ module cpu_ram (
         if (mapped_address > RAM_BYTES) begin
           $fatal(1, "out of bounds read from 0x%08h", address);
         end else begin
-`ifdef DEBUG
+`ifdef DEBUG_T13
           $display("read @ 0x%08x, got 0x%08x", address, {read_0, read_1, read_2, read_3});
 `endif
           readdata <= {read_3, read_2, read_1, read_0};

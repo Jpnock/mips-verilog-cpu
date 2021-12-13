@@ -24,7 +24,7 @@ module ir (
     if (reset_i) begin
       ihold <= 0;
     end else if (wen_i) begin
-`ifdef DEBUG
+`ifdef DEBUG_T13
       if (opcode_o == OP_SPECIAL) begin
         func_display(funct_o);
         $display("%08h", data);
@@ -86,7 +86,7 @@ module ir (
     endcase
   endfunction
 
-`ifdef DEBUG
+`ifdef DEBUG_T13
   task automatic opcode_display(input opcode_t i);
     case (i)
       OP_SPECIAL: $display("Got opcode OP_SPECIAL");
@@ -156,7 +156,7 @@ module ir (
     endcase
   endfunction
 
-`ifdef DEBUG
+`ifdef DEBUG_T13
   task automatic func_display(input func_t i);
     case (i)
       FUNC_SLL:     $display("Got SPECIAL: FUNC_SLL");
@@ -202,7 +202,7 @@ module ir (
     endcase
   endfunction
 
-`ifdef DEBUG
+`ifdef DEBUG_T13
   task automatic regimm_display(input regimm_t i);
     case (i)
       REGIMM_BLTZ:   $display("Got REGIMM: REGIMM_BLTZ");

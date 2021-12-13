@@ -42,7 +42,7 @@ for file in $(echo "$TEST_FILES" | sort); do
     EXTRA_ARGS=$(head -n 2 "$file" | sed -n -e 's/^\(#\|\/\/\) Args: //p')
 
     #Build TB
-    iverilog ${EXTRA_ARGS} -Wall -g 2012 \
+    iverilog -DDEBUG_T13 ${EXTRA_ARGS} -Wall -g 2012 \
         ${SOURCE_DIR}/mips_cpu/*.v ${SOURCE_DIR}/mips_cpu_*.v ./test/rtl/*.v \
         -pfileline=1 \
         -s mips_cpu_bus_tb \

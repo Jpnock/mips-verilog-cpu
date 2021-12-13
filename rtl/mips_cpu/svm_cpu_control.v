@@ -75,7 +75,7 @@ module control (
             OP_SH: tmp_ram_byte_en_o = 4'b0011 << load_store_byte_offset_i;
             OP_SB: tmp_ram_byte_en_o = 4'b0001 << load_store_byte_offset_i;
           endcase
-`ifdef DEBUG
+`ifdef DEBUG_T13
           $display("store: got offset of %d with byte enable of %04b", load_store_byte_offset_i,
                    tmp_ram_byte_en_o);
 `endif

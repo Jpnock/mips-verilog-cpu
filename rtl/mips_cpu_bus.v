@@ -83,7 +83,7 @@ module mips_cpu_bus (
       .state_o(state)
   );
 
-`ifdef DEBUG
+`ifdef DEBUG_T13
   always_ff @(posedge clk) begin
     if (halt) begin
       $display("Halt output (active %d): %08h", active, register_v0);
@@ -165,7 +165,7 @@ module mips_cpu_bus (
       default: begin
         addr_3  = 5'd0;
         alu_out = rd_data_d;
-`ifdef DEBUG
+`ifdef DEBUG_T13
         $fatal(1, "unknown enum value for regfile_addr_3_sel");
 `endif
       end

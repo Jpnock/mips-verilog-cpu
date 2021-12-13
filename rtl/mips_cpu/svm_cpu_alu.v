@@ -235,7 +235,7 @@ module alu (
           0: rt_o = signextend16to32({ram_readdata_offset_0, ram_readdata_offset_1});
           default: rt_o = signextend16to32({ram_readdata_offset_2, ram_readdata_offset_3});
         endcase
-`ifdef DEBUG
+`ifdef DEBUG_T13
         $display("LH: got 0x%08x (orignally 0x%08x) with offset %d", rt_o, ram_readdata_i,
                  load_store_byte_offset_o);
 `endif
@@ -253,7 +253,7 @@ module alu (
           2: rt_o = signextend8to32(ram_readdata_offset_2);
           default: rt_o = signextend8to32(ram_readdata_offset_3);
         endcase
-`ifdef DEBUG
+`ifdef DEBUG_T13
         $display("got LB instruction data 0x%08x @ 0x%08x, loading byte 0x%08x with offset %d",
                  ram_readdata_i, effective_address_o, rt_o, load_store_byte_offset_o);
 `endif
