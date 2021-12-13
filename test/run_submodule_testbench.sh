@@ -1,4 +1,4 @@
-# TODO: Not a deliverable.
+#!/bin/bash
 
 set -euo pipefail
 

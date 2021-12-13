@@ -1,4 +1,4 @@
-# TODO: Remove TEST_WAIT input before submission?
+#!/bin/bash
 
 set -uo pipefail
 

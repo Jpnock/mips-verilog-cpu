@@ -1,3 +1,5 @@
+#!/bin/bash
+
 set -euo pipefail
 
 SOURCE_DIR=${1:-rtl}
