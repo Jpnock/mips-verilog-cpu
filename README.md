@@ -37,3 +37,14 @@ To run the tests:
 ```bash
 $ make test
 ```
+
+## Directory structure
+
+- `.github` contains Github Actions CI workflows for automated testing of the project
+- `build` contains files relevant to building the project, such as a Dockerfile that is used by the CI pipeline
+- `docs` contains CPU documentation, including the datasheet
+- `rtl` contains the HDL for the CPU
+- `rtl/test` contains Verilog module-level CPU test-benches
+- `scripts` contains various scripts created during development for the purpose of automating manual processes
+- `test/mips` contains instruction-level tests, such as C and ASM tests. The binaries are checked into Git to ensure reproducability. They can be re-assembled with `./test/build_instruction_testbench.sh` and `./test/build_c_testbench.sh`
+- `test/rtl` contains the HDL harness for instruction-level testing
