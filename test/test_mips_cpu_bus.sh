@@ -7,4 +7,4 @@ TEST_INSTR=${2-}
 
 rm -rf ./test/bin/
 mkdir -p ./test/bin
-./test/run_instruction_testbench.sh $SOURCE_DIR $TEST_INSTR
+./test/run_instruction_testbench.sh "$SOURCE_DIR" "$TEST_INSTR"
