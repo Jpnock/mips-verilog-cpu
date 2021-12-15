@@ -74,7 +74,7 @@ module cpu_ram (
                  byteenable_3 ? writedata[31:24] : read_3
                  }, address);
 `endif
-        if (mapped_address > RAM_BYTES) begin
+        if ((mapped_address > RAM_BYTES) && (mapped_address != -RAM_OFFSET)) begin
           $fatal(1, "out of bounds write to 0x%08h", address);
         end
         ram[mapped_address]   <= write_0;
@@ -94,7 +94,7 @@ module cpu_ram (
         end else if (mapped_address == -264241156 + 4) begin
           // NOP
           readdata <= 0;
-        end else if (mapped_address > RAM_BYTES) begin
+        end else if ((mapped_address > RAM_BYTES) && (mapped_address != -RAM_OFFSET)) begin
           $fatal(1, "out of bounds read from 0x%08h", address);
         end else begin
 `ifdef DEBUG_T13
