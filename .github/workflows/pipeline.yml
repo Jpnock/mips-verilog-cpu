@@ -7,7 +7,7 @@ on:
 
 jobs:
   build_and_test:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-18.04
     container:
       image: ghcr.io/jpnock/verilog-cpu/builder:v11.0.0
       credentials:
