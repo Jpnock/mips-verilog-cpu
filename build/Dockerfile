@@ -11,7 +11,7 @@ RUN git clone https://github.com/steveicarus/iverilog.git
 
 WORKDIR /tmp/iverilog-build-dir/iverilog
 # NOTE(@jpnock): This is the version I'm using
-RUN git checkout ef01dd1e8161b6ee8bf9549acfa0fefcd1ba8dcb
+RUN git checkout v11_0
 RUN chmod +x ./autoconf.sh
 RUN ./autoconf.sh
 RUN chmod +x ./configure
