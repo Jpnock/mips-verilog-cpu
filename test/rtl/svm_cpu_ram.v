@@ -103,7 +103,7 @@ module cpu_ram (
           readdata <= {read_3, read_2, read_1, read_0};
         end
 `else
-        if (mapped_address > RAM_BYTES) begin
+        if ((mapped_address > RAM_BYTES) && (mapped_address != -RAM_OFFSET)) begin
           $fatal(1, "out of bounds read from 0x%08h", address);
         end else begin
 `ifdef DEBUG_T13
