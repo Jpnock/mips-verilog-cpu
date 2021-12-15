@@ -20,6 +20,6 @@ jobs:
           file: build/Dockerfile
           push: true
           registry: gchr.io
-          tags: ghcr.io/jpnock/verilog-cpu/builder:v11.0.0
+          tags: ghcr.io/jpnock/verilog-cpu/builder:v11.1.0
           secrets: |
             GIT_AUTH_TOKEN=${{ secrets.GITHUB_TOKEN }}
