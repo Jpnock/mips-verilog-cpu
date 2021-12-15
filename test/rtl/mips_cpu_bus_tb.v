@@ -17,7 +17,7 @@ module mips_cpu_bus_tb ();
   parameter RAM_WAIT = 0;
   parameter EXPECTED_VALUE = -1;
 
-  size_t expected_value_reg;
+  logic [31:0] expected_value_reg;
   assign expected_value_reg = EXPECTED_VALUE;
 
   initial begin

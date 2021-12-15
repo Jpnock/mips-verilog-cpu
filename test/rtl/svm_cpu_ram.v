@@ -1,14 +1,12 @@
-import codes::*;
-
 module cpu_ram (
     input logic clk,
     input logic reset,
     input logic read,
     input logic write,
     input logic [3:0] byteenable,
-    input size_t address,
-    input size_t writedata,
-    output size_t readdata,
+    input logic [31:0] address,
+    input logic [31:0] writedata,
+    output logic [31:0] readdata,
     output logic waitrequest
 );
 
@@ -29,7 +27,7 @@ module cpu_ram (
     end
   end
 
-  size_t mapped_address;
+  logic [31:0] mapped_address;
   assign mapped_address = (address - RAM_OFFSET);
 
   logic ram_wait;
