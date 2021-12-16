@@ -1,14 +1,12 @@
-import codes::*;
-
 module cpu_ram (
     input logic clk,
     input logic reset,
     input logic read,
     input logic write,
     input logic [3:0] byteenable,
-    input size_t address,
-    input size_t writedata,
-    output size_t readdata,
+    input logic [31:0] address,
+    input logic [31:0] writedata,
+    output logic [31:0] readdata,
     output logic waitrequest
 );
 
@@ -29,7 +27,7 @@ module cpu_ram (
     end
   end
 
-  size_t mapped_address;
+  logic [31:0] mapped_address;
   assign mapped_address = (address - RAM_OFFSET);
 
   logic ram_wait;
@@ -64,7 +62,7 @@ module cpu_ram (
   end
 
   always_ff @(posedge clk) begin
-    if (waitrequest) begin
+    if (waitrequest | reset) begin
       readdata <= 32'hxxxxxxxx;
     end else begin
       if (write) begin
@@ -76,7 +74,7 @@ module cpu_ram (
                  byteenable_3 ? writedata[31:24] : read_3
                  }, address);
 `endif
-        if (mapped_address > RAM_BYTES) begin
+        if ((mapped_address > RAM_BYTES) && (address != 0)) begin
           $fatal(1, "out of bounds write to 0x%08h", address);
         end
         ram[mapped_address]   <= write_0;
@@ -96,7 +94,7 @@ module cpu_ram (
         end else if (mapped_address == -264241156 + 4) begin
           // NOP
           readdata <= 0;
-        end else if (mapped_address > RAM_BYTES) begin
+        end else if ((mapped_address > RAM_BYTES) && (address != 0)) begin
           $fatal(1, "out of bounds read from 0x%08h", address);
         end else begin
 `ifdef DEBUG_T13
@@ -105,7 +103,7 @@ module cpu_ram (
           readdata <= {read_3, read_2, read_1, read_0};
         end
 `else
-        if (mapped_address > RAM_BYTES) begin
+        if ((mapped_address > RAM_BYTES) && (address != 0)) begin
           $fatal(1, "out of bounds read from 0x%08h", address);
         end else begin
 `ifdef DEBUG_T13

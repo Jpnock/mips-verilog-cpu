@@ -7,7 +7,7 @@ main:
     jr      $zero
 
 L1: 
-    addi	$v0, $ra, 0x0
+    addiu	$v0, $ra, 0x0
     jr      $ra
     
 .data
