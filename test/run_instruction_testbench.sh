@@ -9,14 +9,16 @@ TEST_WAIT=${3:-1}
 
 TEST_FILES=""
 if [[ -z "$TEST_INSTR" ]]; then
-    TEST_FILES=$(find test/mips/** -type f \( -iname \*.asm -o -iname \*.c \) 2> /dev/null)
+    TEST_FILES=$(find test/mips/** -type f \( -iname \*.asm -o -iname \*.c \) 2>/dev/null)
+elif [[ "$TEST_INSTR" == "all" ]]; then
+    TEST_FILES=$(find test/mips/all -type f \( -iname \*.asm -o -iname \*.c \) 2>/dev/null)
 else
-    TEST_FILES=$(find "test/mips/${TEST_INSTR}" -type f \( -iname \*.asm -o -iname \*.c \) 2> /dev/null)
+    TEST_FILES=$(find "test/mips/${TEST_INSTR}" test/mips/all -type f \( -iname \*.asm -o -iname \*.c \) 2>/dev/null)
 fi
 
 if [[ $? -ne 0 ]]; then
     # No test files found
-    exit 0;
+    exit 0
 fi
 
 EXIT_CODE=0
@@ -49,11 +51,11 @@ for file in $(echo "$TEST_FILES" | sort); do
 
     EXTRA_ARGS=$(head -n 2 "$file" | sed -n -e 's/^\(#\|\/\/\) Args: //p')
 
-    MIPS_CPU_FILES=$(find "${SOURCE_DIR}"/mips_cpu -maxdepth 1 -type f -name "*.v" 2> /dev/null | sort)
-    readarray -t MIPS_CPU_FILES_ARR <<< "$MIPS_CPU_FILES"
+    MIPS_CPU_FILES=$(find "${SOURCE_DIR}"/mips_cpu -maxdepth 1 -type f -name "*.v" 2>/dev/null | sort)
+    readarray -t MIPS_CPU_FILES_ARR <<<"$MIPS_CPU_FILES"
 
-    BASE_CPU_FILES=$(find "${SOURCE_DIR}" -maxdepth 1 -type f -name "mips_cpu_*.v" 2> /dev/null | sort)
-    readarray -t BASE_CPU_FILES_ARR <<< "$BASE_CPU_FILES"
+    BASE_CPU_FILES=$(find "${SOURCE_DIR}" -maxdepth 1 -type f -name "mips_cpu_*.v" 2>/dev/null | sort)
+    readarray -t BASE_CPU_FILES_ARR <<<"$BASE_CPU_FILES"
 
     #Build TB
     iverilog -DDEBUG_T13 ${EXTRA_ARGS} -Wall -g 2012 \
@@ -72,7 +74,7 @@ for file in $(echo "$TEST_FILES" | sort); do
     fi
 
     # Run
-    if ! type timeout > /dev/null 2>&1; then 
+    if ! type timeout >/dev/null 2>&1; then
         ./"$out" >"${testlog}" 2>&1
     else
         timeout 15s ./"$out" >"${testlog}" 2>&1
