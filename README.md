@@ -10,7 +10,7 @@ The following packages are required
 
 - gcc-mips-linux-gnu
 - make
-- iverilog (tested against commit-hash ef01dd1e8161b6ee8bf9549acfa0fefcd1ba8dcb)
+- iverilog (tested against v11.0 and commit-hash ef01dd1e8161b6ee8bf9549acfa0fefcd1ba8dcb)
 
 ## Building and testing
 
