@@ -2,7 +2,7 @@
 
 An implementation of a MIPS I ISA compatible CPU.
 
-See the [docs](./docs/) folder for the CPU [datasheet](./docs/datasheet.pdf).
+See the [docs](./docs/) folder for the CPU [datasheet](./docs/mips_data_sheet.pdf).
 
 ## Dependencies
 
